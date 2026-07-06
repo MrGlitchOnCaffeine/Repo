@@ -6,7 +6,7 @@ Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.30
 scikit-learn==1.5.0
 pandas==2.3.2
-numpy==1.26.4
+numpy==2.3.1
 xgboost==2.0.3
 imbalanced-learn==0.12.3
 joblib==1.4.2
