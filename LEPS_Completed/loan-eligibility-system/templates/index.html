@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <p class="hero-eyebrow">Built for the Nigerian lending process</p>
+                <h1 class="hero-headline">
+                    A loan decision shouldn't take a loan officer two weeks to reach.
+                </h1>
+                <p class="hero-sub">
+                    Most eligibility checks here still happen by hand: income slips read line by line,
+                    BVN and NIN checked separately, a verdict that arrives whenever someone gets to it.
+                    This system reads the same financial signals and returns a result before you've
+                    finished your tea.
+                </p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.apply') }}" class="btn btn-gold btn-lg mt-2">Start My Application</a>
+                {% else %}
+                    <a href="{{ url_for('main.register') }}" class="btn btn-gold btn-lg mt-2">Create an Account</a>
+                    <p class="mt-3 hero-login-note">
+                        Already registered?
+                        <a href="{{ url_for('main.login') }}" class="hero-link">Log in here.</a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="leps-credit">
+    <div class="container">
+        <p class="credit-text">Built by <span class="credit-name">[Name]</span></p>
+    </div>
+</section>
+{% endblock %}

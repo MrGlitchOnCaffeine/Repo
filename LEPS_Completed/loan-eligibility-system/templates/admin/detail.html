@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Application Detail | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-admin-section">
+    <div class="container">
+
+        <div class="page-header">
+            <a href="{{ url_for('main.admin_applications') }}" class="back-link">
+                <i class="bi bi-arrow-left me-1"></i> Back to Applications
+            </a>
+            <h2 class="page-title mt-2">Application Detail</h2>
+            <p class="page-subtitle mono">{{ application.reference_id }}</p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Left column: application info -->
+            <div class="col-lg-8">
+
+                <!-- Personal details -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Personal Details</h3>
+                    </div>
+                    <table class="detail-table">
+                        <tr><td class="detail-key">Full Name</td><td>{{ application.full_name }}</td></tr>
+                        <tr><td class="detail-key">Date of Birth</td><td>{{ application.date_of_birth }}</td></tr>
+                        <tr><td class="detail-key">Age</td><td>{{ application.age }}</td></tr>
+                        <tr><td class="detail-key">Gender</td><td>{{ application.gender }}</td></tr>
+                        <tr><td class="detail-key">Marital Status</td><td>{{ application.marital_status }}</td></tr>
+                        <tr><td class="detail-key">Education Level</td><td>{{ application.education_level }}</td></tr>
+                    </table>
+                </div>
+
+                <!-- Employment and identity -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Employment and Identity</h3>
+                    </div>
+                    <table class="detail-table">
+                        <tr><td class="detail-key">Employment Type</td><td>{{ application.employment_type }}</td></tr>
+                        <tr><td class="detail-key">Monthly Income</td><td>&#8358;{{ "{:,.0f}".format(application.monthly_income) }}</td></tr>
+                        <tr><td class="detail-key">BVN Number</td><td class="mono">{{ application.bvn_number }}</td></tr>
+                        <tr><td class="detail-key">NIN Number</td><td class="mono">{{ application.nin_number }}</td></tr>
+                        <tr><td class="detail-key">Address</td><td>{{ application.address }}</td></tr>
+                        <tr><td class="detail-key">City</td><td>{{ application.city }}</td></tr>
+                    </table>
+                </div>
+
+                <!-- Loan request -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Loan Request</h3>
+                    </div>
+                    <table class="detail-table">
+                        <tr><td class="detail-key">Loan Amount Requested</td><td>&#8358;{{ "{:,.0f}".format(application.loan_amount_requested) }}</td></tr>
+                        <tr><td class="detail-key">Repayment Period</td><td>{{ application.loan_tenure_months }} months</td></tr>
+                        <tr>
+                            <td class="detail-key">Existing Loan Defaults</td>
+                            <td>{{ 'Yes' if application.existing_loan_defaults else 'No' }}</td>
+                        </tr>
+                        {% if application.existing_loan_defaults %}
+                            <tr>
+                                <td class="detail-key">Outstanding Loan Amount</td>
+                                <td>&#8358;{{ "{:,.0f}".format(application.existing_loan_amount) }}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+
+                <!-- Prediction detail -->
+                {% if prediction %}
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title">AI Assessment</h3>
+                        </div>
+                        <table class="detail-table">
+                            <tr>
+                                <td class="detail-key">Result</td>
+                                <td>
+                                    {% if prediction.predicted_class == 'Eligible' %}
+                                        <span class="badge-result eligible-badge">Eligible</span>
+                                    {% elif prediction.predicted_class == 'Not Eligible' %}
+                                        <span class="badge-result not-eligible-badge">Not Eligible</span>
+                                    {% else %}
+                                        <span class="badge-result review-badge">Under Review</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="detail-key">Probability Score</td>
+                                <td class="mono">{{ (prediction.probability_score * 100) | round(1) }}%</td>
+                            </tr>
+                            {% if prediction.estimated_loan_amount %}
+                                <tr>
+                                    <td class="detail-key">Estimated Loan Amount</td>
+                                    <td>&#8358;{{ "{:,.0f}".format(prediction.estimated_loan_amount) }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if prediction.denial_reason %}
+                                <tr>
+                                    <td class="detail-key">Denial Reason</td>
+                                    <td>{{ prediction.denial_reason }}</td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="detail-key">Model Version</td>
+                                <td class="mono">{{ prediction.model_version }}</td>
+                            </tr>
+                            <tr>
+                                <td class="detail-key">Assessment Date</td>
+                                <td>{{ prediction.prediction_date.strftime('%d %B %Y, %I:%M %p') }}</td>
+                            </tr>
+                        </table>
+
+                        {% if key_factors %}
+                            <div class="p-3 border-top">
+                                <p class="factors-label">Key Factors</p>
+                                <ul class="factors-list">
+                                    {% for factor in key_factors %}
+                                        <li>{{ factor }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Right column: admin actions -->
+            <div class="col-lg-4">
+
+                <div class="admin-card mb-4">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Update Status</h3>
+                    </div>
+                    <div class="p-3">
+                        <form method="POST" action="{{ url_for('main.admin_update_application', reference_id=application.reference_id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label class="form-label">Application Status</label>
+                                <select class="form-select leps-input" name="status">
+                                    <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Processed" {% if application.status == 'Processed' %}selected{% endif %}>Processed</option>
+                                    <option value="Reviewed" {% if application.status == 'Reviewed' %}selected{% endif %}>Reviewed</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-navy w-100">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+
+                {% if prediction %}
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title">Override Result</h3>
+                        </div>
+                        <div class="p-3">
+                            <p class="override-note">
+                                Overriding the AI result will update what the applicant sees.
+                                This action is logged automatically.
+                            </p>
+                            <form method="POST" action="{{ url_for('main.admin_update_application', reference_id=application.reference_id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Override Result To</label>
+                                    <select class="form-select leps-input" name="override_result">
+                                        <option value="Eligible" {% if prediction.predicted_class == 'Eligible' %}selected{% endif %}>Eligible</option>
+                                        <option value="Not Eligible" {% if prediction.predicted_class == 'Not Eligible' %}selected{% endif %}>Not Eligible</option>
+                                        <option value="Under Review" {% if prediction.predicted_class == 'Under Review' %}selected{% endif %}>Under Review</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-outline-secondary w-100">Apply Override</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

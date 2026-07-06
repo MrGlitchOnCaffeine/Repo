@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Eligibility Result | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-result-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                {% if prediction.predicted_class == 'Eligible' %}
+                    <div class="result-verdict eligible">
+                        <div class="verdict-icon"><i class="bi bi-check-circle-fill"></i></div>
+                        <div class="verdict-text">
+                            <span class="verdict-label">Eligibility Result</span>
+                            <h2 class="verdict-title">Eligible</h2>
+                        </div>
+                    </div>
+                {% elif prediction.predicted_class == 'Not Eligible' %}
+                    <div class="result-verdict not-eligible">
+                        <div class="verdict-icon"><i class="bi bi-x-circle-fill"></i></div>
+                        <div class="verdict-text">
+                            <span class="verdict-label">Eligibility Result</span>
+                            <h2 class="verdict-title">Not Eligible</h2>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="result-verdict under-review">
+                        <div class="verdict-icon"><i class="bi bi-clock-fill"></i></div>
+                        <div class="verdict-text">
+                            <span class="verdict-label">Eligibility Result</span>
+                            <h2 class="verdict-title">Under Review</h2>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="row g-4 mt-1">
+
+                    <!-- Score gauge -->
+                    <div class="col-md-4">
+                        <div class="result-card text-center">
+                            <p class="result-card-label">Application Score</p>
+                            <div class="gauge-wrapper">
+                                <svg class="gauge-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                                    <circle
+                                        class="gauge-track"
+                                        cx="60" cy="60" r="50"
+                                        fill="none"
+                                        stroke-width="10"
+                                    />
+                                    <circle
+                                        class="gauge-fill"
+                                        cx="60" cy="60" r="50"
+                                        fill="none"
+                                        stroke-width="10"
+                                        stroke-dasharray="314"
+                                        stroke-dashoffset="314"
+                                        data-score="{{ prediction.eligibility_percentage if prediction.eligibility_percentage else (prediction.probability_score * 100) | round(1) }}"
+                                        data-class="{{ prediction.predicted_class }}"
+                                    />
+                                </svg>
+                                <div class="gauge-label">
+                                    <span class="gauge-value" id="gauge-value">0%</span>
+                                </div>
+                            </div>
+                            <p class="gauge-caption">Eligibility Score</p>
+                        </div>
+                    </div>
+
+                    <!-- Decision detail -->
+                    <div class="col-md-8">
+                        <div class="result-card">
+                            <p class="result-card-label">Assessment Summary</p>
+
+                            {% if prediction.predicted_class == 'Eligible' and prediction.estimated_loan_amount %}
+                                <div class="loan-estimate-block">
+                                    <span class="estimate-label">Estimated Eligible Amount</span>
+                                    <span class="estimate-amount">
+                                        &#8358;{{ "{:,.0f}".format(prediction.estimated_loan_amount) }}
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            {% if prediction.denial_reason %}
+                                <div class="denial-reason-block">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    {{ prediction.denial_reason }}
+                                </div>
+                            {% endif %}
+
+                            {% if key_factors %}
+                                <div class="key-factors-block">
+                                    <p class="factors-label">Key Factors</p>
+                                    <ul class="factors-list">
+                                        {% for factor in key_factors %}
+                                            <li>{{ factor }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Reference and date -->
+                <div class="result-meta mt-4">
+                    <span class="meta-item">
+                        <span class="meta-label">Reference ID</span>
+                        <span class="meta-value mono">{{ application.reference_id }}</span>
+                    </span>
+                    <span class="meta-divider">|</span>
+                    <span class="meta-item">
+                        <span class="meta-label">Date</span>
+                        <span class="meta-value">
+                            {{ application.application_date.strftime('%d %B %Y, %I:%M %p') }}
+                        </span>
+                    </span>
+                    <span class="meta-divider">|</span>
+                    <span class="meta-item">
+                        <span class="meta-label">Status</span>
+                        <span class="meta-value">{{ application.status }}</span>
+                    </span>
+                </div>
+
+                <!-- Actions -->
+                <div class="result-actions mt-4">
+                    <button class="btn btn-navy" id="download-pdf-btn">
+                        <i class="bi bi-download me-2"></i>Download Result
+                    </button>
+                    <a href="{{ url_for('main.apply') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-repeat me-2"></i>Re-Apply
+                    </a>
+                    <a href="{{ url_for('main.history') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-clock-history me-2"></i>View History
+                    </a>
+                </div>
+
+                <!-- Printable / PDF area (hidden on screen) -->
+                <div id="pdf-content" class="pdf-area" style="display:none;">
+                    <div class="pdf-header">
+                        <h2>Loan Eligibility Prediction System</h2>
+                        <p>Official Eligibility Assessment Report</p>
+                    </div>
+                    <table class="pdf-table">
+                        <tr><td class="pdf-key">Applicant Name</td><td>{{ application.full_name }}</td></tr>
+                        <tr><td class="pdf-key">Reference ID</td><td>{{ application.reference_id }}</td></tr>
+                        <tr><td class="pdf-key">Date of Assessment</td><td>{{ application.application_date.strftime('%d %B %Y') }}</td></tr>
+                        <tr><td class="pdf-key">Eligibility Result</td><td><strong>{{ prediction.predicted_class }}</strong></td></tr>
+                        <tr><td class="pdf-key">Application Score</td><td>{{ (prediction.probability_score * 100) | round(1) }}%</td></tr>
+                        {% if prediction.estimated_loan_amount %}
+                        <tr><td class="pdf-key">Estimated Loan Amount</td><td>&#8358;{{ "{:,.0f}".format(prediction.estimated_loan_amount) }}</td></tr>
+                        {% endif %}
+                        {% if prediction.denial_reason %}
+                        <tr><td class="pdf-key">Reason</td><td>{{ prediction.denial_reason }}</td></tr>
+                        {% endif %}
+                    </table>
+                    <p class="pdf-disclaimer">
+                        This is an academic demonstration. This document does not constitute
+                        a formal financial offer or commitment.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/result.js') }}"></script>
+{% endblock %}

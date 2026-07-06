@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-admin-section">
+    <div class="container">
+
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="page-title">Admin Dashboard</h2>
+                <p class="page-subtitle">Overview of all loan eligibility applications.</p>
+            </div>
+            <a href="{{ url_for('main.admin_applications') }}" class="btn btn-navy">
+                View All Applications
+            </a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <span class="stat-value">{{ total_applications }}</span>
+                    <span class="stat-label">Total Applications</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card stat-eligible">
+                    <span class="stat-value">{{ eligible_count }}</span>
+                    <span class="stat-label">Eligible</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card stat-not-eligible">
+                    <span class="stat-value">{{ not_eligible_count }}</span>
+                    <span class="stat-label">Not Eligible</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card stat-review">
+                    <span class="stat-value">{{ under_review_count }}</span>
+                    <span class="stat-label">Under Review</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="stat-value">{{ total_users }}</span>
+                    <span class="stat-label">Registered Applicants</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="stat-value">
+                        {% if total_applications > 0 %}
+                            {{ ((eligible_count / total_applications) * 100) | round(1) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </span>
+                    <span class="stat-label">Approval Rate</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <a href="{{ url_for('main.admin_applicants') }}" class="stat-link">
+                        Manage Applicants <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                    <span class="stat-label">Applicant Records</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent applications -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">Recent Applications</h3>
+            </div>
+            {% if recent_applications %}
+                <div class="table-responsive">
+                    <table class="table leps-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>Applicant</th>
+                                <th>Date</th>
+                                <th>Loan Amount</th>
+                                <th>Result</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in recent_applications %}
+                                <tr>
+                                    <td class="mono">{{ app.reference_id }}</td>
+                                    <td>{{ app.full_name }}</td>
+                                    <td>{{ app.application_date.strftime('%d %b %Y') }}</td>
+                                    <td>&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</td>
+                                    <td>
+                                        {% if app.prediction %}
+                                            {% if app.prediction.predicted_class == 'Eligible' %}
+                                                <span class="badge-result eligible-badge">Eligible</span>
+                                            {% elif app.prediction.predicted_class == 'Not Eligible' %}
+                                                <span class="badge-result not-eligible-badge">Not Eligible</span>
+                                            {% else %}
+                                                <span class="badge-result review-badge">Under Review</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ app.status }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.admin_application_detail', reference_id=app.reference_id) }}"
+                                           class="btn btn-sm btn-outline-navy">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox empty-icon"></i>
+                    <h4 class="empty-title">No applications yet</h4>
+                    <p class="empty-body">Applications will appear here once applicants submit them.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% block title %}Loan Application | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-form-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="form-page-header">
+                    <h2 class="form-page-title">Loan Eligibility Application</h2>
+                    <p class="form-page-subtitle">
+                        Complete all four sections accurately. The information you provide
+                        is used to assess your loan eligibility.
+                    </p>
+                </div>
+
+                <div class="form-progress mb-4">
+                    <div class="progress-steps">
+                        <div class="progress-step active" id="step-indicator-1">
+                            <span class="step-number">1</span>
+                            <span class="step-label">Personal</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="step-indicator-2">
+                            <span class="step-number">2</span>
+                            <span class="step-label">Employment</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="step-indicator-3">
+                            <span class="step-number">3</span>
+                            <span class="step-label">Identity</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="step-indicator-4">
+                            <span class="step-number">4</span>
+                            <span class="step-label">Loan Request</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="loanApplicationForm" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- SECTION 1: Personal Details -->
+                    <div class="form-section active" id="section-1">
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <span class="section-number">Section 1</span>
+                                <h3 class="section-title">Personal Details</h3>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="full_name" class="form-label">Full Name</label>
+                                <input
+                                    type="text"
+                                    class="form-control leps-input"
+                                    id="full_name"
+                                    name="full_name"
+                                    placeholder="Enter your full name as it appears on your ID"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <input
+                                    type="date"
+                                    class="form-control leps-input"
+                                    id="date_of_birth"
+                                    name="date_of_birth"
+                                    required
+                                >
+                                <div class="form-hint">You must be between 18 and 65 years of age.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select leps-input" id="gender" name="gender" required>
+                                    <option value="" disabled selected>Select your gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="marital_status" class="form-label">Marital Status</label>
+                                <select class="form-select leps-input" id="marital_status" name="marital_status" required>
+                                    <option value="" disabled selected>Select your marital status</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Widowed">Widowed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="education_level" class="form-label">Highest Education Level</label>
+                                <select class="form-select leps-input" id="education_level" name="education_level" required>
+                                    <option value="" disabled selected>Select your education level</option>
+                                    <option value="Primary">Primary</option>
+                                    <option value="Secondary">Secondary</option>
+                                    <option value="Tertiary">Tertiary</option>
+                                    <option value="Postgraduate">Postgraduate</option>
+                                </select>
+                            </div>
+
+                            <div class="form-nav d-flex justify-content-end mt-4">
+                                <button type="button" class="btn btn-navy" id="next-1">
+                                    Next: Employment Details
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: Employment and Income -->
+                    <div class="form-section" id="section-2">
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <span class="section-number">Section 2</span>
+                                <h3 class="section-title">Employment and Income</h3>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="employment_type" class="form-label">Employment Status</label>
+                                <select class="form-select leps-input" id="employment_type" name="employment_type" required>
+                                    <option value="" disabled selected>Select your employment status</option>
+                                    <option value="Salaried">Salaried</option>
+                                    <option value="Self-Employed">Self-Employed</option>
+                                    <option value="Unemployed">Unemployed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="monthly_income" class="form-label">Monthly Income (NGN)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text leps-input-prefix">&#8358;</span>
+                                    <input
+                                        type="number"
+                                        class="form-control leps-input"
+                                        id="monthly_income"
+                                        name="monthly_income"
+                                        placeholder="Enter your net monthly income"
+                                        min="0"
+                                        required
+                                    >
+                                </div>
+                                <div class="form-hint">Enter your take-home pay after tax deductions.</div>
+                            </div>
+
+                            <div class="form-nav d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary" id="back-2">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Back
+                                </button>
+                                <button type="button" class="btn btn-navy" id="next-2">
+                                    Next: Identity Verification
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: Identity Verification -->
+                    <div class="form-section" id="section-3">
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <span class="section-number">Section 3</span>
+                                <h3 class="section-title">Identity Verification</h3>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bvn_number" class="form-label">Bank Verification Number (BVN)</label>
+                                <input
+                                    type="text"
+                                    class="form-control leps-input"
+                                    id="bvn_number"
+                                    name="bvn_number"
+                                    placeholder="Enter your 11-digit BVN"
+                                    maxlength="11"
+                                    required
+                                >
+                                <div class="form-hint">Your BVN is an 11-digit number issued by your bank.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nin_number" class="form-label">National Identification Number (NIN)</label>
+                                <input
+                                    type="text"
+                                    class="form-control leps-input"
+                                    id="nin_number"
+                                    name="nin_number"
+                                    placeholder="Enter your 11-digit NIN"
+                                    maxlength="11"
+                                    required
+                                >
+                                <div class="form-hint">Your NIN is an 11-digit number on your National ID card.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Home Address</label>
+                                <input
+                                    type="text"
+                                    class="form-control leps-input"
+                                    id="address"
+                                    name="address"
+                                    placeholder="Enter your current home address"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input
+                                    type="text"
+                                    class="form-control leps-input"
+                                    id="city"
+                                    name="city"
+                                    placeholder="Enter your city"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-nav d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary" id="back-3">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Back
+                                </button>
+                                <button type="button" class="btn btn-navy" id="next-3">
+                                    Next: Loan Request
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: Loan Request -->
+                    <div class="form-section" id="section-4">
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <span class="section-number">Section 4</span>
+                                <h3 class="section-title">Loan Request</h3>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="loan_amount_requested" class="form-label">Loan Amount Requested (NGN)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text leps-input-prefix">&#8358;</span>
+                                    <input
+                                        type="number"
+                                        class="form-control leps-input"
+                                        id="loan_amount_requested"
+                                        name="loan_amount_requested"
+                                        placeholder="Enter the amount you are requesting"
+                                        min="10000"
+                                        max="2000000"
+                                        required
+                                    >
+                                </div>
+                                <div class="form-hint">Minimum: &#8358;10,000. Maximum: &#8358;2,000,000.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="loan_tenure_months" class="form-label">Repayment Period (Months)</label>
+                                <input
+                                    type="number"
+                                    class="form-control leps-input"
+                                    id="loan_tenure_months"
+                                    name="loan_tenure_months"
+                                    placeholder="Enter number of months to repay"
+                                    min="1"
+                                    max="36"
+                                    required
+                                >
+                                <div class="form-hint">Between 1 and 36 months.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Do you have any existing loan defaults?</label>
+                                <div class="d-flex gap-3 mt-1">
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="existing_loan_defaults"
+                                            id="defaults_no"
+                                            value="0"
+                                            checked
+                                        >
+                                        <label class="form-check-label" for="defaults_no">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="existing_loan_defaults"
+                                            id="defaults_yes"
+                                            value="1"
+                                        >
+                                        <label class="form-check-label" for="defaults_yes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="existing_loan_amount_wrapper" style="display: none;">
+                                <label for="existing_loan_amount" class="form-label">Outstanding Loan Amount (NGN)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text leps-input-prefix">&#8358;</span>
+                                    <input
+                                        type="number"
+                                        class="form-control leps-input"
+                                        id="existing_loan_amount"
+                                        name="existing_loan_amount"
+                                        placeholder="Enter your total outstanding loan amount"
+                                        min="0"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-nav d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary" id="back-4">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Back
+                                </button>
+                                <button type="submit" class="btn btn-gold btn-submit" id="submit-btn">
+                                    <span id="submit-text">Check My Eligibility</span>
+                                    <span id="submit-spinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+                <div id="form-error-banner" class="alert alert-danger mt-3" style="display: none;">
+                    <span id="form-error-text"></span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+{% endblock %}

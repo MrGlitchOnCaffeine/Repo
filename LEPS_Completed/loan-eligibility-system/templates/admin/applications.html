@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}All Applications | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-admin-section">
+    <div class="container">
+
+        <div class="page-header">
+            <h2 class="page-title">All Applications</h2>
+            <p class="page-subtitle">Search, filter, and manage every loan application submitted.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="admin-card mb-4">
+            <form method="GET" action="{{ url_for('main.admin_applications') }}" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Search by Name or Reference ID</label>
+                    <input
+                        type="text"
+                        class="form-control leps-input"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="e.g. John Doe or LEPS-20260622-1234"
+                    >
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Result</label>
+                    <select class="form-select leps-input" name="result">
+                        <option value="">All Results</option>
+                        <option value="Eligible" {% if result_filter == 'Eligible' %}selected{% endif %}>Eligible</option>
+                        <option value="Not Eligible" {% if result_filter == 'Not Eligible' %}selected{% endif %}>Not Eligible</option>
+                        <option value="Under Review" {% if result_filter == 'Under Review' %}selected{% endif %}>Under Review</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Filter by Status</label>
+                    <select class="form-select leps-input" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Processed" {% if status_filter == 'Processed' %}selected{% endif %}>Processed</option>
+                        <option value="Reviewed" {% if status_filter == 'Reviewed' %}selected{% endif %}>Reviewed</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-navy w-100">Search</button>
+                    <a href="{{ url_for('main.admin_applications') }}" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">
+                    {{ applications | length }} Application{{ 's' if applications | length != 1 }}
+                </h3>
+            </div>
+
+            {% if applications %}
+                <div class="table-responsive">
+                    <table class="table leps-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>Applicant</th>
+                                <th>Date</th>
+                                <th>Loan Amount</th>
+                                <th>Score</th>
+                                <th>Result</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                                <tr>
+                                    <td class="mono">{{ app.reference_id }}</td>
+                                    <td>{{ app.full_name }}</td>
+                                    <td>{{ app.application_date.strftime('%d %b %Y') }}</td>
+                                    <td>&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</td>
+                                    <td>
+                                        {% if app.prediction %}
+                                            {{ (app.prediction.probability_score * 100) | round(1) }}%
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if app.prediction %}
+                                            {% if app.prediction.predicted_class == 'Eligible' %}
+                                                <span class="badge-result eligible-badge">Eligible</span>
+                                            {% elif app.prediction.predicted_class == 'Not Eligible' %}
+                                                <span class="badge-result not-eligible-badge">Not Eligible</span>
+                                            {% else %}
+                                                <span class="badge-result review-badge">Under Review</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ app.status }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.admin_application_detail', reference_id=app.reference_id) }}"
+                                           class="btn btn-sm btn-outline-navy">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-search empty-icon"></i>
+                    <h4 class="empty-title">No results found</h4>
+                    <p class="empty-body">No applications match your search or filter criteria.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

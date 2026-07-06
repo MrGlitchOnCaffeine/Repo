@@ -1,0 +1,24 @@
+# Secret credentials - never upload this
+.env
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Local database file - Render uses its own
+*.db
+instance/
+
+# Virtual environment folders
+venv/
+.venv/
+
+# Mac system file
+.DS_Store
+
+# Jupyter notebook checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Training dataset - large file, not needed on Render
+data/loan_dataset.csv

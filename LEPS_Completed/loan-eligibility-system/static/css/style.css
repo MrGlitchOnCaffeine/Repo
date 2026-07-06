@@ -1,0 +1,1079 @@
+/* ============================================================
+   LOAN ELIGIBILITY PREDICTION SYSTEM
+   Main Stylesheet
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   TOKENS
+   ------------------------------------------------------------ */
+:root {
+    /* Core palette - olive and cream, grounded rather than corporate */
+    --olive:       #798645;
+    --olive-dark:  #4A5230;
+    --cream:       #FEFAE0;
+    --sand:        #F2EED7;
+    --ink:         #626F47;
+
+    /* Statement accent - the one tone that breaks from the family */
+    --clay:        #A0522D;
+    --clay-hover:  #8A4526;
+
+    /* Status colours - distinct from the base greens so results never blur */
+    --eligible:    #4A7C3C;
+    --denied:      #B5483A;
+    --review:      #C9A227;
+
+    --bg:         var(--cream);
+    --surface:    #FFFFFF;
+    --border:     #E3DCC4;
+    --text-main:  var(--olive-dark);
+    --text-muted: #7C8268;
+
+    --font-display: 'DM Serif Display', serif;
+    --font-body:    'Inter', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+
+    --radius:    8px;
+    --radius-lg: 14px;
+    --shadow:    0 2px 12px rgba(74, 82, 48, 0.08);
+    --shadow-md: 0 4px 24px rgba(74, 82, 48, 0.14);
+}
+
+/* ------------------------------------------------------------
+   RESET & BASE
+   ------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg);
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ------------------------------------------------------------
+   NAVIGATION
+   ------------------------------------------------------------ */
+.leps-navbar {
+    background-color: var(--olive);
+    padding: 0.85rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.leps-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    text-decoration: none;
+}
+
+.brand-acronym {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--clay);
+    letter-spacing: 0.05em;
+}
+
+.brand-full {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0.01em;
+}
+
+.nav-user-name {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* ------------------------------------------------------------
+   BUTTONS
+   ------------------------------------------------------------ */
+.btn-gold {
+    background-color: var(--clay);
+    color: var(--olive);
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.5rem 1.4rem;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-gold:hover,
+.btn-gold:focus {
+    background-color: var(--clay-hover);
+    color: var(--olive);
+}
+
+.btn-navy {
+    background-color: var(--olive);
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.65rem 1.4rem;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-navy:hover,
+.btn-navy:focus {
+    background-color: var(--olive-dark);
+    color: #ffffff;
+}
+
+/* ------------------------------------------------------------
+   MAIN CONTENT AREA
+   ------------------------------------------------------------ */
+.leps-main {
+    flex: 1;
+}
+
+/* ------------------------------------------------------------
+   HERO SECTION
+   ------------------------------------------------------------ */
+.leps-hero {
+    background-color: var(--olive);
+    padding: 5rem 0 4.5rem;
+    text-align: center;
+}
+
+.hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--clay);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 1.25rem;
+}
+
+.hero-sub {
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 520px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.7;
+}
+
+.hero-login-note {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.75rem;
+}
+
+.hero-link {
+    color: var(--clay);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.hero-link:hover {
+    color: var(--clay-hover);
+    text-decoration: underline;
+}
+
+/* ------------------------------------------------------------
+   CREDIT SECTION
+   ------------------------------------------------------------ */
+.leps-credit {
+    padding: 2.5rem 0 3.5rem;
+    text-align: center;
+}
+
+.credit-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.credit-name {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------
+   AUTH PAGES (Register & Login)
+   ------------------------------------------------------------ */
+.leps-auth-section {
+    padding: 3.5rem 0 4rem;
+}
+
+.auth-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2.25rem;
+    box-shadow: var(--shadow-md);
+}
+
+.auth-card-header {
+    margin-bottom: 1.75rem;
+}
+
+.auth-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--olive);
+    margin-bottom: 0.35rem;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ------------------------------------------------------------
+   FORM INPUTS
+   ------------------------------------------------------------ */
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 0.4rem;
+}
+
+.leps-input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    background-color: var(--surface);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.leps-input:focus {
+    border-color: var(--olive);
+    box-shadow: 0 0 0 3px rgba(74, 82, 48, 0.14);
+    outline: none;
+}
+
+.leps-input::placeholder {
+    color: #A9A586;
+}
+
+.remember-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.auth-switch-text {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.auth-link {
+    color: var(--olive);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    color: var(--clay-hover);
+    text-decoration: underline;
+}
+
+/* ------------------------------------------------------------
+   ALERTS
+   ------------------------------------------------------------ */
+.alert {
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    border: none;
+}
+
+.alert-danger {
+    background-color: #F7E9E2;
+    color: var(--denied);
+    border-left: 4px solid var(--denied);
+}
+
+.alert-success {
+    background-color: #EEF5E6;
+    color: var(--eligible);
+    border-left: 4px solid var(--eligible);
+}
+
+.alert-info {
+    background-color: #F2EED7;
+    color: var(--olive);
+    border-left: 4px solid var(--olive);
+}
+
+/* ------------------------------------------------------------
+   ADMIN SECTION PLACEHOLDER
+   ------------------------------------------------------------ */
+.leps-admin-section {
+    padding: 3rem 0;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--olive);
+    margin-bottom: 0.35rem;
+}
+
+.page-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* ------------------------------------------------------------
+   FOOTER
+   ------------------------------------------------------------ */
+.leps-footer {
+    background-color: var(--olive-dark);
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.footer-note {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin: 0;
+}
+
+/* ------------------------------------------------------------
+   LOAN APPLICATION FORM
+   ------------------------------------------------------------ */
+.leps-form-section {
+    padding: 3rem 0 4rem;
+}
+
+.form-page-header {
+    margin-bottom: 2rem;
+}
+
+.form-page-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--olive);
+    margin-bottom: 0.4rem;
+}
+
+.form-page-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Progress steps */
+.form-progress {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+}
+
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 0 0 auto;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: var(--border);
+    color: var(--text-muted);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.step-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+.progress-step.active .step-number {
+    background-color: var(--olive);
+    color: #ffffff;
+}
+
+.progress-step.active .step-label {
+    color: var(--olive);
+    font-weight: 600;
+}
+
+.progress-step.completed .step-number {
+    background-color: var(--eligible);
+    color: #ffffff;
+}
+
+.progress-step.completed .step-label {
+    color: var(--eligible);
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background-color: var(--border);
+    margin: 0 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+/* Form sections */
+.form-section {
+    display: none;
+}
+
+.form-section-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.25rem 2rem;
+    box-shadow: var(--shadow);
+}
+
+.form-section-header {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-number {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--clay);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--olive);
+    margin: 0;
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+}
+
+.leps-input-prefix {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-right: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+}
+
+.input-group .leps-input {
+    border-left: none;
+}
+
+.input-group .leps-input:focus {
+    border-color: var(--olive);
+    border-left: 1px solid var(--olive);
+}
+
+.btn-submit {
+    min-width: 200px;
+}
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+@media (max-width: 576px) {
+    .auth-card {
+        padding: 1.75rem 1.25rem;
+    }
+
+    .brand-full {
+        display: none;
+    }
+
+    .leps-hero {
+        padding: 3.5rem 0 3rem;
+    }
+
+    .form-section-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .step-label {
+        display: none;
+    }
+}
+
+/* ------------------------------------------------------------
+   RESULT PAGE
+   ------------------------------------------------------------ */
+.leps-result-section {
+    padding: 3rem 0 4rem;
+}
+
+.result-verdict {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.result-verdict.eligible {
+    background-color: #EEF5E6;
+    border: 1px solid #C9DCB5;
+}
+
+.result-verdict.not-eligible {
+    background-color: #F7E9E2;
+    border: 1px solid #E3B8A8;
+}
+
+.result-verdict.under-review {
+    background-color: #FAF1D6;
+    border: 1px solid #E8CE7A;
+}
+
+.verdict-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.eligible .verdict-icon { color: var(--eligible); }
+.not-eligible .verdict-icon { color: var(--denied); }
+.under-review .verdict-icon { color: var(--review); }
+
+.verdict-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.verdict-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+.eligible .verdict-title { color: var(--eligible); }
+.not-eligible .verdict-title { color: var(--denied); }
+.under-review .verdict-title { color: var(--review); }
+
+/* Result cards */
+.result-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 1.5rem;
+    height: 100%;
+    box-shadow: var(--shadow);
+}
+
+.result-card-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* Gauge */
+.gauge-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 0.75rem;
+}
+
+.gauge-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.gauge-track {
+    stroke: var(--border);
+}
+
+.gauge-fill {
+    stroke: var(--eligible);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s linear;
+}
+
+.gauge-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.gauge-value {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.gauge-caption {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Loan estimate */
+.loan-estimate-block {
+    background-color: #EEF5E6;
+    border: 1px solid #C9DCB5;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.estimate-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--eligible);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.25rem;
+}
+
+.estimate-amount {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--eligible);
+}
+
+/* Denial reason */
+.denial-reason-block {
+    background-color: #F7E9E2;
+    border: 1px solid #E3B8A8;
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    color: var(--denied);
+    margin-bottom: 1rem;
+}
+
+/* Key factors */
+.factors-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+}
+
+.factors-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.factors-list li {
+    font-size: 0.875rem;
+    color: var(--text-main);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.factors-list li:last-child {
+    border-bottom: none;
+}
+
+.factors-list li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--clay);
+    flex-shrink: 0;
+}
+
+/* Meta row */
+.result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+}
+
+.meta-item {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.meta-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.meta-value {
+    color: var(--text-main);
+}
+
+.meta-divider {
+    color: var(--border);
+}
+
+.mono {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+/* Action buttons row */
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.btn-outline-navy {
+    border: 1px solid var(--olive);
+    color: var(--olive);
+    font-weight: 500;
+    border-radius: var(--radius);
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    background: transparent;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-outline-navy:hover {
+    background-color: var(--olive);
+    color: #ffffff;
+}
+
+/* ------------------------------------------------------------
+   HISTORY PAGE
+   ------------------------------------------------------------ */
+.leps-history-section {
+    padding: 3rem 0 4rem;
+}
+
+.history-table-wrapper {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.leps-table {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.leps-table thead th {
+    background-color: var(--olive);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.85rem 1rem;
+    border: none;
+}
+
+.leps-table tbody td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    border-color: var(--border);
+    color: var(--text-main);
+}
+
+.leps-table tbody tr:hover {
+    background-color: #FBF8EC;
+}
+
+.badge-result {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.eligible-badge {
+    background-color: #EEF5E6;
+    color: var(--eligible);
+    border: 1px solid #C9DCB5;
+}
+
+.not-eligible-badge {
+    background-color: #F7E9E2;
+    color: var(--denied);
+    border: 1px solid #E3B8A8;
+}
+
+.review-badge {
+    background-color: #FAF1D6;
+    color: var(--review);
+    border: 1px solid #E8CE7A;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--border);
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.empty-title {
+    font-family: var(--font-display);
+    color: var(--olive);
+    margin-bottom: 0.5rem;
+}
+
+.empty-body {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ------------------------------------------------------------
+   PRINT STYLES (PDF download via browser print)
+   ------------------------------------------------------------ */
+@media print {
+    .leps-navbar,
+    .leps-footer,
+    .result-actions,
+    .result-verdict,
+    .gauge-wrapper,
+    .result-meta {
+        display: none !important;
+    }
+
+    .leps-result-section {
+        padding: 0;
+    }
+
+    #pdf-content {
+        display: block !important;
+    }
+
+    .pdf-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #000;
+    }
+
+    .pdf-header h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .pdf-header p {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .pdf-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+
+    .pdf-table td {
+        padding: 0.65rem 0.75rem;
+        border: 1px solid #ddd;
+        font-size: 0.9rem;
+    }
+
+    .pdf-key {
+        background-color: #f5f5f5;
+        font-weight: 600;
+        width: 40%;
+    }
+
+    .pdf-disclaimer {
+        font-size: 0.78rem;
+        color: #888;
+        border-top: 1px solid #ddd;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+}
+
+/* ------------------------------------------------------------
+   ADMIN PAGES
+   ------------------------------------------------------------ */
+.admin-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.admin-card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--bg);
+}
+
+.admin-card-title {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--olive);
+    margin: 0;
+}
+
+/* Stat cards */
+.stat-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.stat-value {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--olive);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.stat-eligible .stat-value { color: var(--eligible); }
+.stat-not-eligible .stat-value { color: var(--denied); }
+.stat-review .stat-value { color: var(--review); }
+
+.stat-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--olive);
+    text-decoration: none;
+}
+
+.stat-link:hover {
+    color: var(--clay-hover);
+}
+
+/* Detail table */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.detail-table td {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+.detail-table tr:last-child td {
+    border-bottom: none;
+}
+
+.detail-key {
+    font-weight: 600;
+    color: var(--text-main);
+    width: 42%;
+    background-color: var(--bg);
+}
+
+/* Override note */
+.override-note {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.55;
+}
+
+/* Back link */
+.back-link {
+    font-size: 0.875rem;
+    color: var(--olive);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: var(--clay-hover);
+}

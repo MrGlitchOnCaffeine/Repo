@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Loan Eligibility Result</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #FEFAE0;
+            color: #4A5230;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .email-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #E3DCC4;
+        }
+
+        /* Header */
+        .email-header {
+            background-color: #4A5230;
+            padding: 1.75rem 2rem;
+        }
+
+        .email-header-brand {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #A0522D;
+            margin-bottom: 0.25rem;
+        }
+
+        .email-header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Verdict banner */
+        .verdict-banner {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #E3DCC4;
+        }
+
+        .verdict-banner.eligible {
+            background-color: #EEF5E6;
+        }
+
+        .verdict-banner.not-eligible {
+            background-color: #F7E9E2;
+        }
+
+        .verdict-banner.under-review {
+            background-color: #FAF1D6;
+        }
+
+        .verdict-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .eligible .verdict-label { color: #4A7C3C; }
+        .not-eligible .verdict-label { color: #B5483A; }
+        .under-review .verdict-label { color: #C9A227; }
+
+        .verdict-result {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .eligible .verdict-result { color: #4A7C3C; }
+        .not-eligible .verdict-result { color: #B5483A; }
+        .under-review .verdict-result { color: #C9A227; }
+
+        /* Body */
+        .email-body {
+            padding: 1.75rem 2rem;
+        }
+
+        .greeting {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: #4A5230;
+        }
+
+        .intro-text {
+            font-size: 0.9rem;
+            color: #7C8268;
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Details table */
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .details-table td {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid #E3DCC4;
+            vertical-align: top;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            font-weight: 600;
+            color: #4A5230;
+            width: 45%;
+            background-color: #FEFAE0;
+        }
+
+        .detail-value {
+            color: #374151;
+        }
+
+        /* Estimate block */
+        .estimate-block {
+            background-color: #EEF5E6;
+            border: 1px solid #C9DCB5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .estimate-block-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4A7C3C;
+            margin-bottom: 0.3rem;
+        }
+
+        .estimate-block-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #4A7C3C;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Denial reason block */
+        .denial-block {
+            background-color: #F7E9E2;
+            border: 1px solid #E3B8A8;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #B5483A;
+            line-height: 1.55;
+        }
+
+        /* Under review block */
+        .review-block {
+            background-color: #FAF1D6;
+            border: 1px solid #E8CE7A;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #C9A227;
+            line-height: 1.55;
+        }
+
+        /* Score */
+        .score-line {
+            font-size: 0.875rem;
+            color: #7C8268;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-value {
+            font-weight: 600;
+            color: #4A5230;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid #E3DCC4;
+            margin: 1.5rem 0;
+        }
+
+        /* Footer */
+        .email-footer {
+            padding: 1.25rem 2rem;
+            background-color: #FEFAE0;
+            border-top: 1px solid #E3DCC4;
+        }
+
+        .disclaimer {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            line-height: 1.6;
+        }
+
+        .reference-line {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            margin-top: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="email-card">
+
+            <!-- Header -->
+            <div class="email-header">
+                <p class="email-header-brand">Loan Eligibility Prediction System</p>
+                <p class="email-header-title">Your Eligibility Assessment Result</p>
+            </div>
+
+            <!-- Verdict banner -->
+            {% if prediction.predicted_class == 'Eligible' %}
+                <div class="verdict-banner eligible">
+                    <span class="verdict-label">Eligibility Result</span>
+                    <p class="verdict-result">Eligible</p>
+                </div>
+            {% elif prediction.predicted_class == 'Not Eligible' %}
+                <div class="verdict-banner not-eligible">
+                    <span class="verdict-label">Eligibility Result</span>
+                    <p class="verdict-result">Not Eligible</p>
+                </div>
+            {% else %}
+                <div class="verdict-banner under-review">
+                    <span class="verdict-label">Eligibility Result</span>
+                    <p class="verdict-result">Under Review</p>
+                </div>
+            {% endif %}
+
+            <!-- Body -->
+            <div class="email-body">
+
+                <p class="greeting">Dear {{ applicant_name }},</p>
+
+                <p class="intro-text">
+                    Thank you for submitting your loan eligibility application.
+                    Your assessment has been completed and your result is shown below.
+                </p>
+
+                <!-- Application details table -->
+                <table class="details-table">
+                    <tr>
+                        <td class="detail-key">Reference ID</td>
+                        <td class="detail-value">{{ application.reference_id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Date of Assessment</td>
+                        <td class="detail-value">
+                            {{ application.application_date.strftime('%d %B %Y, %I:%M %p') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Loan Amount Requested</td>
+                        <td class="detail-value">
+                            &#8358;{{ "{:,.0f}".format(application.loan_amount_requested) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Repayment Period</td>
+                        <td class="detail-value">{{ application.loan_tenure_months }} months</td>
+                    </tr>
+                </table>
+
+                <!-- Score -->
+                <p class="score-line">
+                    Application Score:
+                    <span class="score-value">{{ (prediction.probability_score * 100) | round(1) }}%</span>
+                </p>
+
+                <!-- Eligible: show estimate -->
+                {% if prediction.predicted_class == 'Eligible' and prediction.estimated_loan_amount %}
+                    <div class="estimate-block">
+                        <p class="estimate-block-label">Estimated Eligible Amount</p>
+                        <p class="estimate-block-amount">
+                            &#8358;{{ "{:,.0f}".format(prediction.estimated_loan_amount) }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <!-- Not Eligible: show denial reason -->
+                {% if prediction.predicted_class == 'Not Eligible' and prediction.denial_reason %}
+                    <div class="denial-block">
+                        {{ prediction.denial_reason }}
+                    </div>
+                {% endif %}
+
+                <!-- Under Review: show explanation -->
+                {% if prediction.predicted_class == 'Under Review' %}
+                    <div class="review-block">
+                        Your application requires manual review by a loan officer.
+                        You will be contacted once the review is complete.
+                    </div>
+                {% endif %}
+
+                <hr class="divider">
+
+                <p class="intro-text">
+                    You can log in to your account at any time to view this result,
+                    download it as a PDF, or submit a new application.
+                </p>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="email-footer">
+                <p class="disclaimer">
+                    This is an academic demonstration project and does not constitute
+                    a formal financial offer, commitment, or guarantee of any kind.
+                    This system was developed as part of a research portfolio on
+                    machine learning in the Nigerian financial sector.
+                </p>
+                <p class="reference-line">Ref: {{ application.reference_id }}</p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

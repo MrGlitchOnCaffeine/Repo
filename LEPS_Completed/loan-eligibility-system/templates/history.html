@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Application History | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-history-section">
+    <div class="container">
+
+        <div class="page-header">
+            <h2 class="page-title">Application History</h2>
+            <p class="page-subtitle">All loan eligibility applications submitted under your account.</p>
+        </div>
+
+        {% if applications %}
+            <div class="history-table-wrapper">
+                <table class="table leps-table">
+                    <thead>
+                        <tr>
+                            <th>Reference ID</th>
+                            <th>Date</th>
+                            <th>Loan Amount Requested</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                            <tr>
+                                <td class="mono">{{ app.reference_id }}</td>
+                                <td>{{ app.application_date.strftime('%d %b %Y') }}</td>
+                                <td>&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</td>
+                                <td>
+                                    {% if app.prediction %}
+                                        {{ (app.prediction.probability_score * 100) | round(1) }}%
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if app.prediction %}
+                                        {% if app.prediction.predicted_class == 'Eligible' %}
+                                            <span class="badge-result eligible-badge">Eligible</span>
+                                        {% elif app.prediction.predicted_class == 'Not Eligible' %}
+                                            <span class="badge-result not-eligible-badge">Not Eligible</span>
+                                        {% else %}
+                                            <span class="badge-result review-badge">Under Review</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge-result review-badge">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ app.status }}</td>
+                                <td>
+                                    <a href="{{ url_for('main.result', reference_id=app.reference_id) }}"
+                                       class="btn btn-sm btn-outline-navy">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="history-actions mt-3">
+                <a href="{{ url_for('main.apply') }}" class="btn btn-navy">
+                    <i class="bi bi-plus-lg me-2"></i>New Application
+                </a>
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-folder2-open empty-icon"></i>
+                <h4 class="empty-title">No applications yet</h4>
+                <p class="empty-body">You have not submitted any loan applications. Start one below.</p>
+                <a href="{{ url_for('main.apply') }}" class="btn btn-navy mt-2">Check My Eligibility</a>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

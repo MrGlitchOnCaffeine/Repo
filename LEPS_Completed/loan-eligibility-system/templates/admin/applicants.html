@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Applicants | Loan Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<section class="leps-admin-section">
+    <div class="container">
+
+        <div class="page-header">
+            <h2 class="page-title">Registered Applicants</h2>
+            <p class="page-subtitle">All applicant accounts registered in the system.</p>
+        </div>
+
+        <!-- Search -->
+        <div class="admin-card mb-4">
+            <form method="GET" action="{{ url_for('main.admin_applicants') }}" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">Search by Name or Email</label>
+                    <input
+                        type="text"
+                        class="form-control leps-input"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="e.g. John Doe or john@email.com"
+                    >
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-navy w-100">Search</button>
+                    <a href="{{ url_for('main.admin_applicants') }}" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Applicants table -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">
+                    {{ applicants | length }} Applicant{{ 's' if applicants | length != 1 }}
+                </h3>
+            </div>
+
+            {% if applicants %}
+                <div class="table-responsive">
+                    <table class="table leps-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Email Address</th>
+                                <th>Phone Number</th>
+                                <th>Registered</th>
+                                <th>Last Login</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for applicant in applicants %}
+                                <tr>
+                                    <td>{{ applicant.full_name }}</td>
+                                    <td>{{ applicant.email }}</td>
+                                    <td>{{ applicant.phone_number }}</td>
+                                    <td>{{ applicant.registration_date.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        {% if applicant.last_login %}
+                                            {{ applicant.last_login.strftime('%d %b %Y') }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-people empty-icon"></i>
+                    <h4 class="empty-title">No applicants found</h4>
+                    <p class="empty-body">No applicants match your search criteria.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}
