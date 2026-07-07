@@ -1,0 +1,11 @@
+python -c "
+from app import create_app, db
+from app.models import User
+app = create_app('production')
+with app.app_context():
+    admin = User(full_name='Admin User', email='admin@leps.com', phone_number='08000000000', role='admin')
+    admin.set_password('Admin1234')
+    db.session.add(admin)
+    db.session.commit()
+    print('Admin account created.')
+"
