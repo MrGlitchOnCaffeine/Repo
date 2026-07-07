@@ -3,28 +3,127 @@
 
 {% block content %}
 <section class="leps-hero">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <p class="hero-eyebrow">Built for the Nigerian lending process</p>
+    <div class="container hero-inner">
+        <div class="row align-items-end g-5">
+
+            <!-- Left: copy -->
+            <div class="col-lg-6">
+                <span class="hero-eyebrow">Nigerian Financial Sector</span>
                 <h1 class="hero-headline">
                     A loan decision shouldn't take a loan officer two weeks to reach.
                 </h1>
                 <p class="hero-sub">
-                    Most eligibility checks here still happen by hand: income slips read line by line,
-                    BVN and NIN checked separately, a verdict that arrives whenever someone gets to it.
-                    This system reads the same financial signals and returns a result before you've
-                    finished your tea.
+                    Most eligibility checks here still happen by hand — income slips
+                    read line by line, BVN and NIN verified separately, a verdict
+                    that arrives whenever someone gets to it. This system processes
+                    the same signals and returns a structured result, with a score,
+                    a reason, and an estimated amount, before you have closed the tab.
                 </p>
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.apply') }}" class="btn btn-gold btn-lg mt-2">Start My Application</a>
+                    <a href="{{ url_for('main.apply') }}" class="btn btn-gold btn-lg">
+                        Start My Application
+                    </a>
                 {% else %}
-                    <a href="{{ url_for('main.register') }}" class="btn btn-gold btn-lg mt-2">Create an Account</a>
-                    <p class="mt-3 hero-login-note">
+                    <a href="{{ url_for('main.register') }}" class="btn btn-gold btn-lg">
+                        Create an Account
+                    </a>
+                    <p class="hero-login-note mt-3">
                         Already registered?
                         <a href="{{ url_for('main.login') }}" class="hero-link">Log in here.</a>
                     </p>
                 {% endif %}
+            </div>
+
+            <!-- Right: app preview -->
+            <div class="col-lg-6 hero-preview">
+
+                <!-- Browser frame (desktop only) -->
+                <div class="browser-frame">
+                    <div class="browser-bar">
+                        <div class="browser-dots">
+                            <div class="browser-dot red"></div>
+                            <div class="browser-dot amber"></div>
+                            <div class="browser-dot green"></div>
+                        </div>
+                        <div class="browser-url">leps.onrender.com/result/LEPS-20260622-8821</div>
+                    </div>
+                    <div class="browser-content">
+                        <div class="preview-nav">
+                            <div class="preview-nav-brand">
+                                <div class="preview-nav-dot"><span>LEPS</span></div>
+                                <span class="preview-nav-text">Loan Eligibility Prediction System</span>
+                            </div>
+                            <div class="preview-nav-btn">Log Out</div>
+                        </div>
+                        <div class="preview-result" style="padding: 1rem;">
+                            <div class="preview-verdict">
+                                <div class="preview-verdict-icon"><i class="bi bi-check-circle-fill"></i></div>
+                                <div class="preview-verdict-text">
+                                    <span class="preview-verdict-label">Eligibility Result</span>
+                                    <div class="preview-verdict-value">Eligible</div>
+                                </div>
+                            </div>
+                            <div class="preview-score-row">
+                                <div class="preview-score-card">
+                                    <span class="preview-score-num">84%</span>
+                                    <span class="preview-score-lbl">Application Score</span>
+                                </div>
+                                <div class="preview-amount-card" style="flex:2;">
+                                    <span class="preview-amount-lbl">Estimated Eligible Amount</span>
+                                    <span class="preview-amount-val">&#8358;1,800,000</span>
+                                </div>
+                            </div>
+                            <div style="background:#fff; border:1px solid #EAE4D4; border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:0.4rem;">
+                                <div style="font-family:'JetBrains Mono',monospace; font-size:0.45rem; text-transform:uppercase; letter-spacing:0.08em; color:#9A9DA8; margin-bottom:0.3rem;">Key Factors</div>
+                                <div style="font-size:0.55rem; color:#3A3D48; line-height:1.8;">
+                                    Strong monthly income &nbsp;&middot;&nbsp; BVN registered &nbsp;&middot;&nbsp; No prior defaults
+                                </div>
+                            </div>
+                            <span class="preview-ref">Ref: LEPS-20260622-8821 &nbsp;&middot;&nbsp; 22 June 2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone frame (mobile only) -->
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="phone-notch"></div>
+                        <div class="preview-nav" style="padding:0.5rem 0.75rem;">
+                            <div class="preview-nav-brand">
+                                <div class="preview-nav-dot"><span>LEPS</span></div>
+                                <span class="preview-nav-text">LEPS</span>
+                            </div>
+                            <div class="preview-nav-btn">Log Out</div>
+                        </div>
+                        <div class="preview-result">
+                            <div class="preview-verdict">
+                                <div class="preview-verdict-icon"><i class="bi bi-check-circle-fill"></i></div>
+                                <div class="preview-verdict-text">
+                                    <span class="preview-verdict-label">Result</span>
+                                    <div class="preview-verdict-value">Eligible</div>
+                                </div>
+                            </div>
+                            <div class="preview-score-row">
+                                <div class="preview-score-card">
+                                    <span class="preview-score-num">84%</span>
+                                    <span class="preview-score-lbl">Score</span>
+                                </div>
+                            </div>
+                            <div class="preview-amount-card">
+                                <span class="preview-amount-lbl">Estimated Eligible Amount</span>
+                                <span class="preview-amount-val">&#8358;1,800,000</span>
+                            </div>
+                            <div style="background:#fff; border:1px solid #EAE4D4; border-radius:5px; padding:0.5rem 0.6rem; margin-bottom:0.4rem;">
+                                <div style="font-family:'JetBrains Mono',monospace; font-size:0.42rem; text-transform:uppercase; letter-spacing:0.08em; color:#9A9DA8; margin-bottom:0.25rem;">Key Factors</div>
+                                <div style="font-size:0.5rem; color:#3A3D48; line-height:1.8;">
+                                    Strong income &nbsp;&middot;&nbsp; BVN registered &nbsp;&middot;&nbsp; No prior defaults
+                                </div>
+                            </div>
+                            <span class="preview-ref">LEPS-20260622-8821</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
