@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Colour based on result
         if (predictedClass === 'Eligible') {
-            gaugeFill.style.stroke = '#4A7C3C';
+            gaugeFill.style.stroke = '#2D6A3F';
         } else if (predictedClass === 'Not Eligible') {
-            gaugeFill.style.stroke = '#B5483A';
+            gaugeFill.style.stroke = '#8C2A1E';
         } else {
-            gaugeFill.style.stroke = '#C9A227';
+            gaugeFill.style.stroke = '#7A5C00';
         }
 
         // Animate from 0 to the actual score
