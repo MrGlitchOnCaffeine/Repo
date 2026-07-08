@@ -2,23 +2,55 @@
 
 {% block content %}
 <style>
+    :root {
+        --slate: #1E2028;
+        --slate-mid: #2C3040;
+        --slate-soft: #3A3F52;
+        --saffron: #C49A1A;
+        --saffron-hover: #A8821A;
+        --saffron-light: #E8C84A;
+        --saffron-faint: #F5ECC0;
+        --off-white: #F8F5EE;
+        --warm-white: #FDFBF6;
+        --border-warm: #EAE4D4;
+        --border-mid: #D6CEB8;
+        --white: #FFFFFF;
+        --eligible: #2D6B40;
+        --eligible-bg: #EBF5EE;
+        --eligible-bd: #A8D4B4;
+        --denied: #8C2A1E;
+        --denied-bg: #F5EBEA;
+        --denied-bd: #D4A09A;
+        --review: #7A5200;
+        --review-bg: #F5EDD6;
+        --review-bd: #D4B87A;
+        --text-primary: #1A1C22;
+        --text-body: #3A3D48;
+        --text-muted: #6B6E7A;
+        --text-faint: #9A9DA8;
+        --bg: var(--off-white);
+        --surface: var(--white);
+        --border: var(--border-warm);
+    }
+
     .app-score-page {
-        padding: 2rem 0 3rem;
+        padding: clamp(1rem, 2vw, 2rem) 0 3rem;
+        background: linear-gradient(180deg, var(--bg), var(--warm-white));
     }
 
     .score-shell {
-        max-width: 980px;
+        max-width: 1080px;
         margin: 0 auto;
     }
 
     .score-hero {
         position: relative;
         overflow: hidden;
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 24px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
-        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
-        padding: 1.75rem;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: linear-gradient(180deg, var(--warm-white), rgba(255, 255, 255, 0.98));
+        box-shadow: 0 10px 28px rgba(30, 32, 40, 0.06);
+        padding: clamp(1.1rem, 2vw, 1.8rem);
         margin-bottom: 1.25rem;
     }
 
@@ -26,8 +58,8 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 36%),
-                    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.07), transparent 30%);
+        background: radial-gradient(circle at top right, rgba(196, 154, 26, 0.08), transparent 32%),
+                    radial-gradient(circle at bottom left, rgba(45, 107, 64, 0.05), transparent 30%);
         pointer-events: none;
     }
 
@@ -37,30 +69,32 @@
         gap: .5rem;
         padding: .4rem .75rem;
         border-radius: 999px;
-        background: rgba(59, 130, 246, 0.08);
-        color: #2563eb;
+        background: var(--saffron-faint);
+        color: var(--slate);
         font-size: .82rem;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: .02em;
         margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
     }
 
     .hero-title {
-        font-size: clamp(1.8rem, 4vw, 2.6rem);
-        line-height: 1.1;
+        font-size: clamp(1.7rem, 4vw, 2.6rem);
+        line-height: 1.08;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--text-primary);
         margin-bottom: .65rem;
         position: relative;
         z-index: 1;
     }
 
     .hero-subtitle {
-        max-width: 60ch;
-        color: #475569;
-        font-size: 1rem;
-        line-height: 1.65;
-        margin-bottom: 1.5rem;
+        max-width: 65ch;
+        color: var(--text-body);
+        font-size: clamp(.98rem, 2vw, 1.03rem);
+        line-height: 1.7;
+        margin-bottom: 1.35rem;
         position: relative;
         z-index: 1;
     }
@@ -76,14 +110,14 @@
 
     .score-card,
     .meta-card {
-        border-radius: 22px;
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        border-radius: 18px;
+        border: 1px solid rgba(214, 206, 184, 0.95);
+        background: var(--surface);
+        box-shadow: 0 8px 24px rgba(30, 32, 40, 0.05);
     }
 
     .score-card {
-        padding: 1.5rem;
+        padding: clamp(1rem, 2vw, 1.5rem);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -92,39 +126,39 @@
     }
 
     .meta-card {
-        padding: 1.25rem;
+        padding: clamp(1rem, 2vw, 1.25rem);
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: .9rem;
+        gap: .35rem;
     }
 
     .gauge-wrap {
-        width: min(100%, 320px);
+        width: min(100%, 330px);
         display: grid;
         place-items: center;
         margin-bottom: 1rem;
+        position: relative;
     }
 
     .gauge {
-        width: 280px;
-        height: 280px;
-        transform: rotate(-90deg);
+        width: clamp(230px, 34vw, 320px);
+        height: clamp(230px, 34vw, 320px);
         overflow: visible;
-        filter: drop-shadow(0 10px 25px rgba(15, 23, 42, 0.08));
+        filter: drop-shadow(0 10px 20px rgba(30, 32, 40, 0.07));
+        transform: rotate(-90deg);
     }
 
     .gauge-bg {
         fill: none;
-        stroke: #e2e8f0;
-        stroke-width: 16;
+        stroke: var(--border-warm);
+        stroke-width: 15;
     }
 
     .gauge-progress {
         fill: none;
-        stroke: url(#scoreGradient);
-        stroke-width: 16;
         stroke-linecap: round;
+        stroke-width: 15;
         stroke-dasharray: 0 999;
         stroke-dashoffset: 0;
         transition: stroke-dasharray 1.2s ease;
@@ -132,63 +166,77 @@
 
     .gauge-center {
         position: absolute;
-        display: grid;
-        place-items: center;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
-        width: 180px;
-        height: 180px;
+        width: clamp(132px, 38vw, 184px);
+        height: clamp(132px, 38vw, 184px);
+        padding: 12px;
         border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.99), rgba(253,251,246,0.98));
+        border: 1px solid rgba(214, 206, 184, 0.9);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
     }
 
     .gauge-value {
-        font-size: 2.35rem;
+        font-size: clamp(1.75rem, 6vw, 2.45rem);
         font-weight: 800;
         line-height: 1;
         letter-spacing: -0.03em;
-        color: #0f172a;
+        color: var(--text-primary);
     }
 
     .gauge-label {
-        margin-top: .35rem;
-        font-size: .88rem;
-        color: #64748b;
-        font-weight: 600;
+        margin-top: 6px;
+        font-size: clamp(.66rem, 2vw, .92rem);
+        line-height: 1.15;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-align: center;
+        max-width: 90%;
+        word-break: break-word;
     }
 
     .decision-badge {
         display: inline-flex;
         align-items: center;
         gap: .5rem;
-        padding: .5rem .85rem;
+        padding: .55rem .9rem;
         border-radius: 999px;
         font-size: .9rem;
-        font-weight: 700;
+        font-weight: 800;
         margin-bottom: .8rem;
+        border: 1px solid transparent;
     }
 
     .decision-eligible {
-        background: rgba(16, 185, 129, 0.12);
-        color: #047857;
+        background: var(--eligible-bg);
+        color: var(--eligible);
+        border-color: var(--eligible-bd);
     }
 
     .decision-review {
-        background: rgba(245, 158, 11, 0.12);
-        color: #b45309;
+        background: var(--review-bg);
+        color: var(--review);
+        border-color: var(--review-bd);
     }
 
     .decision-noteligible {
-        background: rgba(239, 68, 68, 0.12);
-        color: #b91c1c;
+        background: var(--denied-bg);
+        color: var(--denied);
+        border-color: var(--denied-bd);
     }
 
     .score-note {
         max-width: 48ch;
-        font-size: .96rem;
-        line-height: 1.65;
-        color: #475569;
+        font-size: .97rem;
+        line-height: 1.7;
+        color: var(--text-body);
         text-align: center;
         margin: 0 auto;
     }
@@ -196,7 +244,7 @@
     .meta-title {
         font-size: 1rem;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--text-primary);
         margin-bottom: .15rem;
     }
 
@@ -205,8 +253,8 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 1rem;
-        padding: .85rem 0;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        padding: .88rem 0;
+        border-bottom: 1px solid rgba(214, 206, 184, 0.7);
     }
 
     .meta-row:last-child {
@@ -215,23 +263,23 @@
     }
 
     .meta-label {
-        font-size: .82rem;
-        color: #64748b;
-        font-weight: 700;
+        font-size: .8rem;
+        color: var(--text-muted);
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: .06em;
     }
 
     .meta-value {
         font-size: .98rem;
-        color: #0f172a;
-        font-weight: 700;
+        color: var(--text-primary);
+        font-weight: 800;
         text-align: right;
     }
 
     .meta-help {
         font-size: .85rem;
-        color: #64748b;
+        color: var(--text-muted);
         margin-top: .25rem;
     }
 
@@ -239,11 +287,11 @@
         display: inline-flex;
         align-items: center;
         gap: .4rem;
-        padding: .35rem .65rem;
+        padding: .36rem .68rem;
         border-radius: 999px;
-        background: rgba(59, 130, 246, 0.1);
-        color: #1d4ed8;
-        font-weight: 700;
+        background: var(--saffron-faint);
+        color: var(--slate);
+        font-weight: 800;
         font-size: .84rem;
     }
 
@@ -259,36 +307,53 @@
 
     @media (max-width: 575.98px) {
         .app-score-page {
-            padding: 1rem 0 2rem;
+            padding: .9rem 0 1.6rem;
         }
 
         .score-hero {
-            padding: 1.1rem;
-            border-radius: 20px;
+            padding: 1rem;
+            border-radius: 18px;
         }
 
         .score-card,
         .meta-card {
-            border-radius: 18px;
-            padding: 1rem;
+            border-radius: 16px;
+            padding: .95rem;
         }
 
         .score-card {
-            min-height: 310px;
+            min-height: 300px;
         }
 
         .gauge {
-            width: 230px;
-            height: 230px;
+            width: 225px;
+            height: 225px;
         }
 
         .gauge-center {
-            width: 150px;
-            height: 150px;
+            width: 132px;
+            height: 132px;
+            padding: 10px;
         }
 
         .gauge-value {
-            font-size: 1.95rem;
+            font-size: 1.82rem;
+        }
+
+        .gauge-label {
+            font-size: .68rem;
+            line-height: 1.12;
+        }
+
+        .meta-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: .3rem;
+        }
+
+        .meta-value {
+            text-align: left;
+            font-size: .95rem;
         }
     }
 </style>
@@ -308,26 +373,23 @@
             {% set loan_amount = prediction.estimated_loan_amount if prediction and prediction.estimated_loan_amount is not none else None %}
             {% set submitted_on = prediction.prediction_date if prediction and prediction.prediction_date else None %}
             {% set status_text = application.status if application and application.status else 'Pending' %}
+            {% set gauge_color = '#2D6B40' %}
+            {% if predicted_class|lower in ['review', 'requires review', 'pending review'] %}
+                {% set gauge_color = '#7A5200' %}
+            {% elif predicted_class|lower not in ['eligible'] %}
+                {% set gauge_color = '#8C2A1E' %}
+            {% endif %}
 
             <div class="score-grid">
                 <div class="score-card">
                     <div class="gauge-wrap position-relative">
                         <svg class="gauge" viewBox="0 0 220 220" aria-hidden="true">
-                            <defs>
-                                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#60a5fa"></stop>
-                                    <stop offset="50%" stop-color="#34d399"></stop>
-                                    <stop offset="100%" stop-color="#10b981"></stop>
-                                </linearGradient>
-                            </defs>
                             <circle class="gauge-bg" cx="110" cy="110" r="82"></circle>
-                            <circle class="gauge-progress" cx="110" cy="110" r="82" data-score="{{ score_value }}"></circle>
+                            <circle class="gauge-progress" cx="110" cy="110" r="82" data-score="{{ score_value }}" style="stroke: {{ gauge_color }};"></circle>
                         </svg>
                         <div class="gauge-center">
-                            <div>
-                                <div class="gauge-value" data-score-value>{{ score_value }}%</div>
-                                <div class="gauge-label">Eligibility Score</div>
-                            </div>
+                            <div class="gauge-value" data-score-value>{{ score_value }}%</div>
+                            <div class="gauge-label">Eligibility Score</div>
                         </div>
                     </div>
 
@@ -413,9 +475,6 @@
     var score = parseFloat(progressCircle.getAttribute('data-score')) || 0;
     var radius = 82;
     var circumference = 2 * Math.PI * radius;
-
-    progressCircle.style.strokeDasharray = '0 ' + circumference;
-    progressCircle.style.strokeDashoffset = '0';
 
     function animateGauge() {
         var start = null;
