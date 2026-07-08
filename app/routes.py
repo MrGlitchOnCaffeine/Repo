@@ -441,13 +441,3 @@ def history():
     ).order_by(LoanApplication.application_date.desc()).all()
 
     return render_template('history.html', applications=applications)
-
-
-@main.route("/check-admin")
-def check_admin():
-    user = User.query.filter_by(email="admin@leps.com").first()
-
-    if not user:
-        return "Admin NOT found."
-
-    return f"Admin found: {user.email}, role={user.role}"
