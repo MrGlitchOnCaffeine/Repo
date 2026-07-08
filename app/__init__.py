@@ -60,7 +60,7 @@ def create_app(config_name='default'):
 
     with app.app_context():
     db.create_all()
-
+    
     create_user_if_missing(
         name=os.getenv("ADMIN_NAME", "Admin User"),
         email=os.getenv("ADMIN_EMAIL"),
@@ -77,7 +77,7 @@ def create_app(config_name='default'):
         role="user"
     )
 
-    return app
+return app
 
 
 @login_manager.user_loader
