@@ -4,6 +4,8 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from config import config
+import os
+from app.models import User
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -40,7 +42,6 @@ def create_admin():
         db.session.commit()
 
 def create_app(config_name='default'):
-    import os
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     app = Flask(
         __name__,
@@ -66,7 +67,6 @@ def create_app(config_name='default'):
 
 @login_manager.user_loader
 def load_user(user_id):
-    from app.models import User
     return User.query.get(int(user_id))
     
     
