@@ -459,6 +459,37 @@ def application_submitted(reference_id):
         key_factors=key_factors
     )
 
+@main.route('/application-details/<reference_id>')
+@login_required
+def application_details(reference_id):
+    if current_user.is_admin():
+        return redirect(url_for('main.admin_dashboard'))
+
+    application = LoanApplication.query.filter_by(
+        reference_id=reference_id,
+        user_id=current_user.id
+    ).first()
+
+    if not application:
+        flash('Application not found.', 'danger')
+        return redirect(url_for('main.index'))
+
+    import json
+
+    key_factors = []
+
+    if application.prediction and application.prediction.key_factors:
+        try:
+            key_factors = json.loads(application.prediction.key_factors)
+        except (ValueError, TypeError):
+            key_factors = []
+
+    return render_template(
+        'application_details.html',
+        application=application,
+        prediction=application.prediction,
+        key_factors=key_factors
+    )
 
 @main.route('/history')
 @login_required
