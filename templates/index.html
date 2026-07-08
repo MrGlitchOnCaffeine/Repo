@@ -37,181 +37,201 @@
             </div>
         </div>
 
-        <!-- Preview mockup block -->
-        <div class="row justify-content-center">
-            <div class="col-lg-9 col-xl-8">
-                <div class="hero-preview-wrap">
+<!-- Preview mockup block -->
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        <div class="hero-preview-wrap">
 
-                    <!-- Browser frame: desktop only -->
-                    <div class="browser-frame d-none d-md-block">
-                        <div class="browser-bar">
-                            <div class="browser-dots">
-                                <div class="browser-dot red"></div>
-                                <div class="browser-dot amber"></div>
-                                <div class="browser-dot green"></div>
-                            </div>
-                            <div class="browser-url">leps.onrender.com/result/LEPS-20260622-8821</div>
+            <!-- Browser frame: desktop only -->
+            <div class="browser-frame d-none d-md-block">
+                <div class="browser-bar">
+                    <div class="browser-dots">
+                        <div class="browser-dot red"></div>
+                        <div class="browser-dot amber"></div>
+                        <div class="browser-dot green"></div>
+                    </div>
+                    <div class="browser-url">https://app.leps.ng/dashboard</div>
+                </div>
+
+                <div class="browser-content">
+                    <div class="preview-nav">
+                        <div class="preview-nav-brand">
+                            <div class="preview-nav-dot"><span>LEPS</span></div>
+                            <span class="preview-nav-text">Loan Eligibility Prediction System</span>
                         </div>
-                        <div class="browser-content">
-
-                            <!-- Mini nav -->
-                            <div class="preview-nav">
-                                <div class="preview-nav-brand">
-                                    <div class="preview-nav-dot"><span>LEPS</span></div>
-                                    <span class="preview-nav-text">Loan Eligibility Prediction System</span>
-                                </div>
-                                <div class="preview-nav-btn">Log Out</div>
-                            </div>
-
-                            <!-- Mini result page -->
-                            <div class="preview-result-wrap">
-
-                                <!-- Verdict banner -->
-                                <div class="preview-verdict-banner">
-                                    <div class="preview-verdict-icon">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                    </div>
-                                    <div>
-                                        <span class="preview-verdict-label">Eligibility Result</span>
-                                        <div class="preview-verdict-value">Eligible</div>
-                                    </div>
-                                </div>
-
-                                <!-- Score + summary row -->
-                                <div class="preview-cards-row">
-
-                                    <!-- Gauge card -->
-                                    <div class="preview-card preview-gauge-card">
-                                        <span class="preview-card-label">Application Score</span>
-                                        <div class="preview-gauge-wrap">
-                                            <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"
-                                                 class="preview-gauge-svg">
-                                                <circle cx="60" cy="60" r="50" fill="none"
-                                                        stroke="#EAE4D4" stroke-width="10"/>
-                                                <circle cx="60" cy="60" r="50" fill="none"
-                                                        stroke="#2D6B40" stroke-width="10"
-                                                        stroke-dasharray="314"
-                                                        stroke-dashoffset="55"
-                                                        stroke-linecap="round"/>
-                                            </svg>
-                                            <div class="preview-gauge-label">
-                                                <span class="preview-gauge-num">84%</span>
-                                            </div>
-                                        </div>
-                                        <span class="preview-gauge-caption">Eligibility Score</span>
-                                    </div>
-
-                                    <!-- Summary card -->
-                                    <div class="preview-card preview-summary-card">
-                                        <span class="preview-card-label">Assessment Summary</span>
-                                        <div class="preview-estimate-block">
-                                            <span class="preview-estimate-lbl">Estimated Eligible Amount</span>
-                                            <span class="preview-estimate-val">&#8358;1,800,000</span>
-                                        </div>
-                                        <div class="preview-factors-block">
-                                            <span class="preview-factors-lbl">Key Factors</span>
-                                            <ul class="preview-factors-list">
-                                                <li>Strong monthly income</li>
-                                                <li>BVN registered</li>
-                                                <li>No history of loan defaults</li>
-                                                <li>Stable salaried employment</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <!-- Meta row -->
-                                <div class="preview-meta-row">
-                                    <span class="preview-meta-item">
-                                        <span class="preview-meta-lbl">Reference ID</span>
-                                        <span class="preview-meta-val">LEPS-20260622-8821</span>
-                                    </span>
-                                    <span class="preview-meta-sep">|</span>
-                                    <span class="preview-meta-item">
-                                        <span class="preview-meta-lbl">Date</span>
-                                        <span class="preview-meta-val">22 June 2026</span>
-                                    </span>
-                                    <span class="preview-meta-sep">|</span>
-                                    <span class="preview-meta-item">
-                                        <span class="preview-meta-lbl">Status</span>
-                                        <span class="preview-meta-val">Pending</span>
-                                    </span>
-                                </div>
-
-                            </div>
+                        <div class="preview-nav-user">
+                            <span class="preview-user-avatar">MJ</span>
+                            <span class="preview-user-name">Michael Johnson</span>
                         </div>
                     </div>
 
-                    <!-- Phone frame: mobile only -->
-                    <div class="phone-frame d-md-none">
-                        <div class="phone-screen">
-                            <div class="phone-notch"></div>
-                            <div class="preview-nav" style="padding:0.45rem 0.7rem;">
-                                <div class="preview-nav-brand">
-                                    <div class="preview-nav-dot"><span>LEPS</span></div>
-                                    <span class="preview-nav-text">LEPS</span>
-                                </div>
-                                <div class="preview-nav-btn">Log Out</div>
+                    <div class="preview-dashboard">
+                        <div class="preview-hero-card">
+                            <div>
+                                <span class="preview-kicker">Welcome back</span>
+                                <h3 class="preview-title">Michael Johnson</h3>
+                                <p class="preview-copy">
+                                    Your latest application is under review and the system has already generated a score.
+                                </p>
                             </div>
-                            <div style="padding: 0.65rem;">
 
-                                <!-- Verdict -->
-                                <div class="preview-verdict-banner" style="margin-bottom:0.5rem; padding:0.5rem 0.65rem;">
-                                    <div class="preview-verdict-icon" style="font-size:0.9rem;">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                    </div>
-                                    <div>
-                                        <span class="preview-verdict-label">Result</span>
-                                        <div class="preview-verdict-value" style="font-size:0.75rem;">Eligible</div>
+                            <div class="preview-verdict-banner preview-verdict-eligible">
+                                <div class="preview-verdict-icon">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </div>
+                                <div>
+                                    <span class="preview-verdict-label">Application Score</span>
+                                    <div class="preview-verdict-value">87% Eligible</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preview-stats-grid">
+                            <div class="preview-card preview-stat-card">
+                                <span class="preview-card-label">Reference ID</span>
+                                <div class="preview-stat-value">LEPS-240812</div>
+                            </div>
+
+                            <div class="preview-card preview-stat-card">
+                                <span class="preview-card-label">Current Status</span>
+                                <div class="preview-stat-value">
+                                    <span class="preview-status-pill">Pending Review</span>
+                                </div>
+                            </div>
+
+                            <div class="preview-card preview-stat-card">
+                                <span class="preview-card-label">Estimated Loan</span>
+                                <div class="preview-stat-value">₦1,250,000</div>
+                            </div>
+
+                            <div class="preview-card preview-stat-card">
+                                <span class="preview-card-label">Submitted</span>
+                                <div class="preview-stat-value">Today</div>
+                            </div>
+                        </div>
+
+                        <div class="preview-bottom-grid">
+                            <div class="preview-card preview-gauge-card">
+                                <span class="preview-card-label">Eligibility Score</span>
+
+                                <div class="preview-gauge-wrap">
+                                    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="preview-gauge-svg">
+                                        <circle cx="60" cy="60" r="50" fill="none" stroke="#EAE4D4" stroke-width="10"/>
+                                        <circle cx="60" cy="60" r="50" fill="none" stroke="#2D6B40" stroke-width="10"
+                                                stroke-dasharray="314" stroke-dashoffset="41" stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="preview-gauge-label">
+                                        <span class="preview-gauge-num">87%</span>
                                     </div>
                                 </div>
 
-                                <!-- Gauge -->
-                                <div class="preview-card text-center" style="padding:0.5rem; margin-bottom:0.4rem;">
-                                    <span class="preview-card-label">Score</span>
-                                    <div class="preview-gauge-wrap" style="width:60px; height:60px;">
-                                        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"
-                                             style="width:100%;height:100%;transform:rotate(-90deg);">
-                                            <circle cx="60" cy="60" r="50" fill="none"
-                                                    stroke="#EAE4D4" stroke-width="10"/>
-                                            <circle cx="60" cy="60" r="50" fill="none"
-                                                    stroke="#2D6B40" stroke-width="10"
-                                                    stroke-dasharray="314"
-                                                    stroke-dashoffset="55"
-                                                    stroke-linecap="round"/>
-                                        </svg>
-                                        <div class="preview-gauge-label">
-                                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:500;color:#1A1C22;">84%</span>
-                                        </div>
-                                    </div>
+                                <span class="preview-gauge-caption">Eligible</span>
+                            </div>
+
+                            <div class="preview-card preview-summary-card">
+                                <span class="preview-card-label">Assessment Summary</span>
+
+                                <div class="preview-estimate-block">
+                                    <span class="preview-estimate-lbl">Estimated Eligible Amount</span>
+                                    <span class="preview-estimate-val">&#8358;1,250,000</span>
                                 </div>
 
-                                <!-- Estimate -->
-                                <div class="preview-card" style="padding:0.45rem 0.55rem; margin-bottom:0.4rem;">
-                                    <span class="preview-estimate-lbl">Estimated Amount</span>
-                                    <span class="preview-estimate-val" style="font-size:0.7rem;">&#8358;1,800,000</span>
-                                </div>
-
-                                <!-- Factors -->
-                                <div class="preview-card" style="padding:0.45rem 0.55rem;">
+                                <div class="preview-factors-block">
                                     <span class="preview-factors-lbl">Key Factors</span>
                                     <ul class="preview-factors-list">
                                         <li>Strong monthly income</li>
-                                        <li>BVN registered</li>
-                                        <li>No prior defaults</li>
+                                        <li>BVN verified successfully</li>
+                                        <li>No history of defaults</li>
+                                        <li>Stable salaried employment</li>
                                     </ul>
                                 </div>
-
                             </div>
+                        </div>
+
+                        <div class="preview-meta-row">
+                            <span class="preview-meta-item">
+                                <span class="preview-meta-lbl">Submitted</span>
+                                <span class="preview-meta-val">Today • 2:34 PM</span>
+                            </span>
+                            <span class="preview-meta-sep">|</span>
+                            <span class="preview-meta-item">
+                                <span class="preview-meta-lbl">Decision</span>
+                                <span class="preview-meta-val">Pending Review</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone frame: mobile only -->
+            <div class="phone-frame d-md-none">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+
+                    <div class="preview-nav" style="padding:0.55rem 0.75rem;">
+                        <div class="preview-nav-brand">
+                            <div class="preview-nav-dot"><span>LEPS</span></div>
+                            <span class="preview-nav-text">LEPS</span>
+                        </div>
+                        <div class="preview-nav-user">
+                            <span class="preview-user-avatar">MJ</span>
                         </div>
                     </div>
 
+                    <div style="padding: 0.7rem;">
+                        <div class="preview-verdict-banner preview-verdict-eligible" style="margin-bottom:0.6rem; padding:0.65rem 0.75rem;">
+                            <div class="preview-verdict-icon" style="font-size:0.95rem;">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div>
+                                <span class="preview-verdict-label">Application Score</span>
+                                <div class="preview-verdict-value" style="font-size:0.9rem;">87% Eligible</div>
+                            </div>
+                        </div>
+
+                        <div class="preview-card text-center" style="padding:0.75rem; margin-bottom:0.55rem;">
+                            <span class="preview-card-label">Reference ID</span>
+                            <div class="preview-mobile-ref">LEPS-240812</div>
+                            <div class="preview-mobile-status">
+                                <span class="preview-status-pill">Pending Review</span>
+                            </div>
+                        </div>
+
+                        <div class="preview-card" style="padding:0.7rem 0.75rem; margin-bottom:0.55rem;">
+                            <span class="preview-card-label">Estimated Loan</span>
+                            <div class="preview-mobile-amount">&#8358;1,250,000</div>
+                        </div>
+
+                        <div class="preview-card" style="padding:0.7rem 0.75rem; margin-bottom:0.55rem;">
+                            <span class="preview-card-label">Key Factors</span>
+                            <ul class="preview-factors-list preview-factors-list-mobile">
+                                <li>Strong monthly income</li>
+                                <li>BVN verified successfully</li>
+                                <li>No history of defaults</li>
+                            </ul>
+                        </div>
+
+                        <div class="preview-card" style="padding:0.75rem;">
+                            <span class="preview-card-label">Eligibility Score</span>
+                            <div class="preview-gauge-wrap preview-gauge-wrap-mobile">
+                                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="preview-gauge-svg">
+                                    <circle cx="60" cy="60" r="50" fill="none" stroke="#EAE4D4" stroke-width="10"/>
+                                    <circle cx="60" cy="60" r="50" fill="none" stroke="#2D6B40" stroke-width="10"
+                                            stroke-dasharray="314" stroke-dashoffset="41" stroke-linecap="round"/>
+                                </svg>
+                                <div class="preview-gauge-label">
+                                    <span class="preview-gauge-num">87%</span>
+                                </div>
+                            </div>
+                            <span class="preview-gauge-caption">Eligible</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
+</div>
 </section>
 
 <section class="leps-credit">
