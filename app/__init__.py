@@ -17,7 +17,6 @@ login_manager.login_message_category = 'info'
 
 from app.models import User
 
-#Admin User Creation
 
 def create_admin():
     admin_email = os.getenv("ADMIN_EMAIL")
@@ -35,11 +34,10 @@ def create_admin():
             phone_number=os.getenv("ADMIN_PHONE", ""),
             role="admin"
         )
-
         admin.set_password(admin_password)
-
         db.session.add(admin)
         db.session.commit()
+
 
 def create_app(config_name='default'):
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,6 +53,9 @@ def create_app(config_name='default'):
     mail.init_app(app)
     csrf.init_app(app)
 
+    from app.routes import predict
+    csrf.exempt(predict)
+
     from app.routes import main
     app.register_blueprint(main)
 
@@ -68,5 +69,3 @@ def create_app(config_name='default'):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-    
-    
