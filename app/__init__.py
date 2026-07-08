@@ -58,26 +58,26 @@ def create_app(config_name='default'):
     from app.routes import main
     app.register_blueprint(main)
 
-with app.app_context():
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     
-    create_user_if_missing(
-        name=os.getenv("ADMIN_NAME", "Admin User"),
-        email=os.getenv("ADMIN_EMAIL"),
-        password=os.getenv("ADMIN_PASSWORD"),
-        phone=os.getenv("ADMIN_PHONE", ""),
-        role="admin"
-    )
+        create_user_if_missing(
+            name=os.getenv("ADMIN_NAME", "Admin User"),
+            email=os.getenv("ADMIN_EMAIL"),
+            password=os.getenv("ADMIN_PASSWORD"),
+            phone=os.getenv("ADMIN_PHONE", ""),
+            role="admin"
+        )
 
-    create_user_if_missing(
-        name=os.getenv("TEST_USER_NAME", "Test Applicant"),
-        email=os.getenv("TEST_USER_EMAIL"),
-        password=os.getenv("TEST_USER_PASSWORD"),
-        phone=os.getenv("TEST_USER_PHONE", ""),
-        role="user"
-    )
+        create_user_if_missing(
+            name=os.getenv("TEST_USER_NAME", "Test Applicant"),
+            email=os.getenv("TEST_USER_EMAIL"),
+            password=os.getenv("TEST_USER_PASSWORD"),
+            phone=os.getenv("TEST_USER_PHONE", ""),
+            role="user"
+        )
 
-return app
+    return app
 
 
 @login_manager.user_loader
