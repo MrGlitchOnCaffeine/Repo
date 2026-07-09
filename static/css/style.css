@@ -2202,3 +2202,119 @@ button, a, [role="button"] {
         width: 100%;
     }
 }
+
+.home-hero {
+    padding-top: 4.5rem;
+    padding-bottom: 3rem;
+}
+
+.home-preview-panel {
+    margin-top: 1.5rem;
+}
+
+.home-preview-card {
+    background: var(--white);
+    border: 1px solid var(--border-warm);
+    border-radius: 18px;
+    padding: 1.2rem;
+    box-shadow: 0 10px 24px rgba(30, 32, 40, 0.06);
+    text-align: left;
+}
+
+.home-preview-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.home-preview-label {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+
+.home-preview-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.home-preview-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: var(--saffron-faint);
+    color: var(--slate);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.home-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.home-preview-item {
+    border: 1px solid var(--border-warm);
+    border-radius: 14px;
+    padding: 0.85rem;
+    background: var(--warm-white);
+}
+
+.home-preview-item-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+
+.home-preview-item-value {
+    display: block;
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.home-preview-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.home-preview-empty .home-preview-text {
+    margin: 0.35rem 0 0;
+    color: var(--text-body);
+    line-height: 1.7;
+}
+
+@media (max-width: 575.98px) {
+    .home-preview-header {
+        flex-direction: column;
+    }
+
+    .home-preview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-preview-actions .btn {
+        width: 100%;
+    }
+}
