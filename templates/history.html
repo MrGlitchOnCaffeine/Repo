@@ -2,111 +2,207 @@
 {% block title %}Application History | Loan Eligibility Prediction System{% endblock %}
 
 {% block content %}
-<section class="leps-history-section">
+<section class="leps-history-section history-page">
     <div class="container">
-        
+
         {% set ns = namespace(total=0, eligible=0, pending=0, denied=0) %}
-{% for app in applications %}
-    {% set ns.total = ns.total + 1 %}
-    {% if app.prediction and app.prediction.predicted_class %}
-        {% if app.prediction.predicted_class|lower == 'eligible' %}
-            {% set ns.eligible = ns.eligible + 1 %}
-        {% elif app.prediction.predicted_class|lower == 'not eligible' %}
-            {% set ns.denied = ns.denied + 1 %}
-        {% else %}
-            {% set ns.pending = ns.pending + 1 %}
-        {% endif %}
-    {% else %}
-        {% set ns.pending = ns.pending + 1 %}
-    {% endif %}
-{% endfor %}
+        {% for app in applications %}
+            {% set ns.total = ns.total + 1 %}
+            {% if app.prediction and app.prediction.predicted_class %}
+                {% if app.prediction.predicted_class|lower == 'eligible' %}
+                    {% set ns.eligible = ns.eligible + 1 %}
+                {% elif app.prediction.predicted_class|lower == 'not eligible' %}
+                    {% set ns.denied = ns.denied + 1 %}
+                {% else %}
+                    {% set ns.pending = ns.pending + 1 %}
+                {% endif %}
+            {% else %}
+                {% set ns.pending = ns.pending + 1 %}
+            {% endif %}
+        {% endfor %}
 
-<div class="history-dashboard">
-    <div class="history-summary-grid">
-        <div class="history-summary-card">
-            <span class="history-summary-label">Total Applications</span>
-            <div class="history-summary-value">{{ ns.total }}</div>
+        <div class="history-header">
+            <div>
+                <h2 class="page-title">Application History</h2>
+                <p class="page-subtitle">
+                    Review every loan eligibility application submitted under your account.
+                </p>
+            </div>
+
+            <div class="history-header-actions">
+                <a href="{{ url_for('main.apply') }}" class="btn btn-navy">
+                    New Application
+                </a>
+            </div>
         </div>
 
-        <div class="history-summary-card eligible">
-            <span class="history-summary-label">Eligible</span>
-            <div class="history-summary-value">{{ ns.eligible }}</div>
-        </div>
+        <div class="history-dashboard">
+            <div class="history-summary-grid">
+                <div class="history-summary-card">
+                    <span class="history-summary-label">Total Applications</span>
+                    <div class="history-summary-value">{{ ns.total }}</div>
+                    <div class="history-summary-note">All submissions on your account</div>
+                </div>
 
-        <div class="history-summary-card pending">
-            <span class="history-summary-label">Pending / Review</span>
-            <div class="history-summary-value">{{ ns.pending }}</div>
-        </div>
+                <div class="history-summary-card eligible">
+                    <span class="history-summary-label">Eligible</span>
+                    <div class="history-summary-value">{{ ns.eligible }}</div>
+                    <div class="history-summary-note">Applications marked eligible</div>
+                </div>
 
-        <div class="history-summary-card denied">
-            <span class="history-summary-label">Not Eligible</span>
-            <div class="history-summary-value">{{ ns.denied }}</div>
-        </div>
-    </div>
+                <div class="history-summary-card pending">
+                    <span class="history-summary-label">Pending / Review</span>
+                    <div class="history-summary-value">{{ ns.pending }}</div>
+                    <div class="history-summary-note">Applications awaiting review</div>
+                </div>
 
-    <div class="history-toolbar">
-        <div class="history-search-group">
-            <label for="historySearch" class="history-toolbar-label">Search</label>
-            <input
-                type="search"
-                id="historySearch"
-                class="form-control history-search-input"
-                placeholder="Search by Reference ID, status, or score...">
-        </div>
+                <div class="history-summary-card denied">
+                    <span class="history-summary-label">Not Eligible</span>
+                    <div class="history-summary-value">{{ ns.denied }}</div>
+                    <div class="history-summary-note">Applications not approved</div>
+                </div>
+            </div>
 
-        <div class="history-search-group">
-            <label for="historyStatusFilter" class="history-toolbar-label">Filter by Status</label>
-            <select id="historyStatusFilter" class="form-control history-search-input">
-                <option value="all">All</option>
-                <option value="eligible">Eligible</option>
-                <option value="pending">Pending / Review</option>
-                <option value="not-eligible">Not Eligible</option>
-            </select>
-        </div>
-    </div>
+            {% if applications %}
+                <div class="history-toolbar">
+                    <div class="history-search-group">
+                        <label for="historySearch" class="history-toolbar-label">Search</label>
+                        <input
+                            type="search"
+                            id="historySearch"
+                            class="form-control history-search-input"
+                            placeholder="Search by Reference ID, status, or score...">
+                    </div>
 
-        <div class="page-header">
-            <h2 class="page-title">Application History</h2>
-            <p class="page-subtitle">All loan eligibility applications submitted under your account.</p>
-        </div>
+                    <div class="history-search-group">
+                        <label for="historyStatusFilter" class="history-toolbar-label">Filter by Status</label>
+                        <select id="historyStatusFilter" class="form-control history-search-input">
+                            <option value="all">All</option>
+                            <option value="eligible">Eligible</option>
+                            <option value="pending">Pending / Review</option>
+                            <option value="not-eligible">Not Eligible</option>
+                        </select>
+                    </div>
+                </div>
 
-        {% if applications %}
-            <div class="history-table-wrapper">
-                <table class="table leps-table">
-                    <thead>
-                        <tr>
-                            <th>Reference ID</th>
-                            <th>Date</th>
-                            <th>Loan Amount Requested</th>
-                            <th>Score</th>
-                            <th>Result</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for app in applications %}
+                <div class="history-section-head">
+                    <h3 class="history-section-title">Applications</h3>
+                    <p class="history-section-subtitle">
+                        Open any reference to review the full application details.
+                    </p>
+                </div>
+
+                <div class="history-table-wrapper d-none d-md-block">
+                    <table class="table leps-table history-table">
+                        <thead>
                             <tr>
-                                <td class="mono">
+                                <th>Reference ID</th>
+                                <th>Date</th>
+                                <th>Loan Amount Requested</th>
+                                <th>Score</th>
+                                <th>Result</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                                {% set row_status = 'pending' %}
+                                {% set row_score = 'n/a' %}
+                                {% if app.prediction and app.prediction.predicted_class %}
+                                    {% if app.prediction.predicted_class|lower == 'eligible' %}
+                                        {% set row_status = 'eligible' %}
+                                    {% elif app.prediction.predicted_class|lower == 'not eligible' %}
+                                        {% set row_status = 'not-eligible' %}
+                                    {% else %}
+                                        {% set row_status = 'pending' %}
+                                    {% endif %}
+                                    {% set row_score = (app.prediction.probability_score * 100) | round(1) %}
+                                {% endif %}
+
+                                <tr
+                                    data-history-desktop-item
+                                    data-status="{{ row_status }}"
+                                    data-search="{{ app.reference_id|lower }} {{ app.status|lower }} {% if app.prediction %}{{ app.prediction.predicted_class|lower }} {{ row_score }}{% endif %}">
+                                    <td class="mono">
+                                        <a href="{{ url_for('main.application_details', reference_id=app.reference_id) }}"
+                                           class="history-reference-link">
+                                            {{ app.reference_id }}
+                                        </a>
+                                    </td>
+                                    <td>{{ app.application_date.strftime('%d %b %Y') }}</td>
+                                    <td>&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</td>
+                                    <td>
+                                        {% if app.prediction %}
+                                            {{ (app.prediction.probability_score * 100) | round(1) }}%
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if app.prediction %}
+                                            {% if app.prediction.predicted_class|lower == 'eligible' %}
+                                                <span class="badge-result eligible-badge">Eligible</span>
+                                            {% elif app.prediction.predicted_class|lower == 'not eligible' %}
+                                                <span class="badge-result not-eligible-badge">Not Eligible</span>
+                                            {% else %}
+                                                <span class="badge-result review-badge">Under Review</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge-result review-badge">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ app.status }}</td>
+                                    <td class="history-actions-cell">
+                                        <a href="{{ url_for('main.application_details', reference_id=app.reference_id) }}"
+                                           class="btn btn-sm btn-outline-navy">
+                                            View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="history-mobile-list d-md-none">
+                    {% for app in applications %}
+                        {% set row_status = 'pending' %}
+                        {% set row_score = 'N/A' %}
+                        {% set row_result = 'Pending' %}
+                        {% if app.prediction and app.prediction.predicted_class %}
+                            {% if app.prediction.predicted_class|lower == 'eligible' %}
+                                {% set row_status = 'eligible' %}
+                                {% set row_result = 'Eligible' %}
+                            {% elif app.prediction.predicted_class|lower == 'not eligible' %}
+                                {% set row_status = 'not-eligible' %}
+                                {% set row_result = 'Not Eligible' %}
+                            {% else %}
+                                {% set row_status = 'pending' %}
+                                {% set row_result = 'Under Review' %}
+                            {% endif %}
+                            {% set row_score = (app.prediction.probability_score * 100) | round(1) ~ '%' %}
+                        {% endif %}
+
+                        <article
+                            class="history-mobile-card"
+                            data-history-mobile-item
+                            data-status="{{ row_status }}"
+                            data-search="{{ app.reference_id|lower }} {{ app.status|lower }} {% if app.prediction %}{{ app.prediction.predicted_class|lower }} {{ row_score|lower }}{% endif %}">
+                            <div class="history-mobile-top">
+                                <div>
+                                    <div class="history-mobile-label">Reference ID</div>
                                     <a href="{{ url_for('main.application_details', reference_id=app.reference_id) }}"
-                                        class="history-reference-link">
+                                       class="history-reference-link history-mobile-ref">
                                         {{ app.reference_id }}
                                     </a>
-                                </td>
-                                <td>{{ app.application_date.strftime('%d %b %Y') }}</td>
-                                <td>&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</td>
-                                <td>
+                                </div>
+
+                                <div class="history-mobile-result">
                                     {% if app.prediction %}
-                                        {{ (app.prediction.probability_score * 100) | round(1) }}%
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if app.prediction %}
-                                        {% if app.prediction.predicted_class == 'Eligible' %}
+                                        {% if app.prediction.predicted_class|lower == 'eligible' %}
                                             <span class="badge-result eligible-badge">Eligible</span>
-                                        {% elif app.prediction.predicted_class == 'Not Eligible' %}
+                                        {% elif app.prediction.predicted_class|lower == 'not eligible' %}
                                             <span class="badge-result not-eligible-badge">Not Eligible</span>
                                         {% else %}
                                             <span class="badge-result review-badge">Under Review</span>
@@ -114,35 +210,116 @@
                                     {% else %}
                                         <span class="badge-result review-badge">Pending</span>
                                     {% endif %}
-                                </td>
-                                <td>{{ app.status }}</td>
-                                <td>
-                                    <a href="{{ url_for('main.application_details', reference_id=app.reference_id) }}"
-                                        class="btn btn-sm btn-outline-navy">
-                                        View Details
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                            </div>
 
-            <div class="history-actions mt-3">
-                <a href="{{ url_for('main.apply') }}" class="btn btn-navy">
-                    <i class="bi bi-plus-lg me-2"></i>New Application
-                </a>
-            </div>
+                            <div class="history-mobile-grid">
+                                <div class="history-mobile-item">
+                                    <span class="history-mobile-label">Date</span>
+                                    <span class="history-mobile-value">{{ app.application_date.strftime('%d %b %Y') }}</span>
+                                </div>
+                                <div class="history-mobile-item">
+                                    <span class="history-mobile-label">Loan Amount Requested</span>
+                                    <span class="history-mobile-value">&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</span>
+                                </div>
+                                <div class="history-mobile-item">
+                                    <span class="history-mobile-label">Score</span>
+                                    <span class="history-mobile-value">
+                                        {% if app.prediction %}
+                                            {{ (app.prediction.probability_score * 100) | round(1) }}%
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="history-mobile-item">
+                                    <span class="history-mobile-label">Status</span>
+                                    <span class="history-mobile-value">{{ app.status }}</span>
+                                </div>
+                            </div>
 
-        {% else %}
-            <div class="empty-state">
-                <i class="bi bi-folder2-open empty-icon"></i>
-                <h4 class="empty-title">No applications yet</h4>
-                <p class="empty-body">You have not submitted any loan applications. Start one below.</p>
-                <a href="{{ url_for('main.apply') }}" class="btn btn-navy mt-2">Check My Eligibility</a>
-            </div>
-        {% endif %}
+                            <div class="history-mobile-footer">
+                                <a href="{{ url_for('main.application_details', reference_id=app.reference_id) }}"
+                                   class="btn btn-sm btn-outline-navy history-mobile-btn">
+                                    View Details
+                                </a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
 
+                <div id="historyNoResults" class="history-empty-state d-none">
+                    No applications match your search or filter.
+                </div>
+
+                <div class="history-actions mt-3">
+                    <a href="{{ url_for('main.apply') }}" class="btn btn-navy">
+                        New Application
+                    </a>
+                </div>
+            {% else %}
+                <div class="history-empty-state">
+                    <h4 class="empty-title">No applications yet</h4>
+                    <p class="empty-body">
+                        You have not submitted any loan applications yet. Start your first application to receive an eligibility assessment.
+                    </p>
+                    <a href="{{ url_for('main.apply') }}" class="btn btn-navy mt-2">Start First Application</a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('historySearch');
+    const statusFilter = document.getElementById('historyStatusFilter');
+    const noResults = document.getElementById('historyNoResults');
+    const desktopMode = window.matchMedia('(min-width: 768px)');
+
+    function getActiveItems() {
+        return Array.from(document.querySelectorAll(
+            desktopMode.matches ? '[data-history-desktop-item]' : '[data-history-mobile-item]'
+        ));
+    }
+
+    function applyFilters() {
+        if (!searchInput || !statusFilter) return;
+
+        const query = searchInput.value.trim().toLowerCase();
+        const status = statusFilter.value;
+        const items = getActiveItems();
+
+        let visibleCount = 0;
+
+        items.forEach(function (item) {
+            const text = item.getAttribute('data-search') || '';
+            const rowStatus = item.getAttribute('data-status') || 'pending';
+
+            const matchesQuery = !query || text.indexOf(query) !== -1;
+            const matchesStatus = status === 'all' || rowStatus === status;
+
+            const show = matchesQuery && matchesStatus;
+            item.style.display = show ? '' : 'none';
+
+            if (show) visibleCount += 1;
+        });
+
+        if (noResults) {
+            noResults.classList.toggle('d-none', visibleCount !== 0);
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
+
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyFilters);
+    }
+
+    window.addEventListener('resize', applyFilters);
+    applyFilters();
+});
+</script>
 {% endblock %}
