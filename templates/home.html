@@ -65,20 +65,32 @@
                             </div>
 
                             <div class="home-definition-row">
-                                <dt>Status</dt>
-                                <dd>{{ app.status }}</dd>
-                            </div>
+    <dt>Status</dt>
+    <dd>
+        {% if pred %}
+            {% if pred.predicted_class == 'Eligible' %}
+                <span class="badge-result eligible-badge">Eligible</span>
+            {% elif pred.predicted_class == 'Not Eligible' %}
+                <span class="badge-result not-eligible-badge">Not Eligible</span>
+            {% else %}
+                <span class="badge-result review-badge">Under Review</span>
+            {% endif %}
+        {% else %}
+            <span class="badge-result review-badge">Pending</span>
+        {% endif %}
+    </dd>
+</div>
 
                             <div class="home-definition-row">
-                                <dt>Eligibility Score</dt>
-                                <dd>
-                                    {% if pred and pred.eligibility_percentage is not none %}
-                                        {{ pred.eligibility_percentage }}%
-                                    {% else %}
-                                        Not available
-                                    {% endif %}
-                                </dd>
-                            </div>
+    <dt>Eligibility Score</dt>
+    <dd>
+        {% if pred %}
+            {{ (pred.probability_score * 100) | round(1) }}%
+        {% else %}
+            Not available
+        {% endif %}
+    </dd>
+</div>
 
                             <div class="home-definition-row">
                                 <dt>Estimated Loan</dt>
