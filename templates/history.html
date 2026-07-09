@@ -27,7 +27,12 @@
                     <tbody>
                         {% for app in applications %}
                             <tr>
-                                <td class="mono">{{ app.reference_id }}</td>
+                                <td class="mono">
+                                    <a href="{{ url_for('main.application_details', reference_id=app.reference_id) }}"
+                                        class="history-reference-link">
+                                        {{ app.reference_id }}
+                                    </a>
+                                </td>
                                 <td>{{ app.application_date.strftime('%d %b %Y') }}</td>
                                 <td>&#8358;{{ "{:,.0f}".format(app.loan_amount_requested) }}</td>
                                 <td>
