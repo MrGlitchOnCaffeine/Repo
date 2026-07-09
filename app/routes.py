@@ -23,13 +23,6 @@ def index():
     if current_user.is_authenticated and current_user.is_admin():
         return redirect(url_for('main.admin_dashboard'))
 
-    home_data = {
-        'is_authenticated': False,
-        'user_name': None,
-        'latest_application': None,
-        'has_applications': False,
-    }
-
     if current_user.is_authenticated:
         applications = (
             LoanApplication.query
@@ -41,16 +34,14 @@ def index():
         latest_application = applications[0] if applications else None
 
         home_data = {
-            'is_authenticated': True,
             'user_name': current_user.full_name or current_user.email,
             'latest_application': latest_application,
-            'has_applications': len(applications) > 0,
+            'has_applications': bool(applications),
         }
 
-    return render_template(
-        'index.html',
-        home_data=home_data
-    )
+        return render_template('home.html', home_data=home_data)
+
+    return render_template('index.html')
 
 
 @main.route('/register', methods=['GET', 'POST'])
