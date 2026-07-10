@@ -226,8 +226,7 @@ body {
 /* ------------------------------------------------------------
    BUTTONS
    ------------------------------------------------------------ */
-.btn-gold,
-.btn-primary-leps {
+.btn-gold {
     background-color: var(--saffron);
     color: var(--slate);
     font-weight: 700;
@@ -244,15 +243,12 @@ body {
     user-select: none;
 }
 
-.btn-gold:hover,
-.btn-primary-leps:hover { background-color: var(--saffron-hover); color: var(--slate); transform: translateY(-1px); }
-.btn-gold:active,
-.btn-primary-leps:active { transform: translateY(0); background-color: var(--saffron-hover); }
+.btn-gold:hover { background-color: var(--saffron-hover); color: var(--slate); transform: translateY(-1px); }
+.btn-gold:active { transform: translateY(0); background-color: var(--saffron-hover); }
 .btn-gold.btn-lg { padding: 0.85rem 2.25rem; font-size: 1rem; border-radius: var(--r-lg); }
 .btn-gold.btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
 
-.btn-navy,
-.btn-secondary-leps {
+.btn-navy {
     background-color: var(--slate);
     color: #fff;
     font-weight: 600;
@@ -269,10 +265,69 @@ body {
     user-select: none;
 }
 
-.btn-navy:hover,
-.btn-secondary-leps:hover { background-color: var(--slate-mid); color: #fff; }
+.btn-navy:hover { background-color: var(--slate-mid); color: #fff; }
 .btn-navy:active { background-color: var(--slate-soft); color: #fff; }
 .btn-navy.btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
+
+.btn-primary-leps {
+    background-color: var(--saffron);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    border: 1px solid var(--saffron);
+    border-radius: 12px;
+    padding: 0.85rem 1.1rem;
+    min-height: 48px;
+    transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.btn-primary-leps:hover {
+    background-color: var(--saffron-hover);
+    border-color: var(--saffron-hover);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn-primary-leps:active {
+    transform: translateY(0);
+    background-color: var(--saffron-hover);
+}
+
+.btn-secondary-leps {
+    background-color: #fff;
+    color: var(--slate);
+    font-weight: 800;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-mid);
+    border-radius: 12px;
+    padding: 0.85rem 1.1rem;
+    min-height: 48px;
+    transition: transform 0.18s ease, background-color 0.18s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.btn-secondary-leps:hover {
+    background-color: var(--warm-white);
+    color: var(--slate);
+    transform: translateY(-1px);
+}
 .btn-navy.w-100 { width: 100%; text-align: center; }
 
 .btn-outline-navy,
@@ -2236,7 +2291,8 @@ button, a, [role="button"] {
     flex-wrap:wrap;
 }
 
-.home-cta-group .btn{
+.home-cta-group .btn,
+.home-cta-group .btn-leps {
     min-width:190px;
 }
 
