@@ -239,11 +239,18 @@ def admin_applications():
     if status_filter:
         query = query.filter(LoanApplication.status == status_filter)
 
-    applications = query.order_by(LoanApplication.application_date.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    per_page = 25
+
+    pagination = query.order_by(LoanApplication.application_date.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    applications = pagination.items
 
     return render_template(
         'admin/applications.html',
         applications=applications,
+        pagination=pagination,
         search=search,
         result_filter=result_filter,
         status_filter=status_filter
@@ -372,6 +379,9 @@ def admin_update_application(reference_id):
 @admin_required
 def admin_applicants():
     search = request.args.get('search', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+
     query = User.query.filter_by(role='applicant')
 
     if search:
@@ -382,8 +392,185 @@ def admin_applicants():
             )
         )
 
-    applicants = query.order_by(User.registration_date.desc()).all()
-    return render_template('admin/applicants.html', applicants=applicants, search=search)
+    pagination = query.order_by(User.registration_date.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    applicants = pagination.items
+
+    return render_template(
+        'admin/applicants.html',
+        applicants=applicants,
+        pagination=pagination,
+        search=search
+    )
+
+
+@main.route('/admin/applicants/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_edit_applicant(user_id):
+    from app.models import AdminLog
+    applicant = User.query.get_or_404(user_id)
+
+    if applicant.is_admin():
+        flash('Administrator accounts cannot be edited here.', 'danger')
+        return redirect(url_for('main.admin_applicants'))
+
+    if request.method == 'POST':
+        old_name = applicant.full_name
+        old_phone = applicant.phone_number
+
+        new_name = request.form.get('full_name', '').strip()
+        new_phone = request.form.get('phone_number', '').strip()
+
+        if not new_name:
+            flash('Full name is required.', 'danger')
+            return render_template('admin/edit_applicant.html', applicant=applicant)
+
+        applicant.full_name = new_name
+        applicant.phone_number = new_phone
+        db.session.commit()
+
+        changes = []
+        if old_name != new_name:
+            changes.append(f'name: {old_name} -> {new_name}')
+        if old_phone != new_phone:
+            changes.append(f'phone: {old_phone} -> {new_phone}')
+
+        description = f'Edited applicant #{user_id}'
+        if changes:
+            description += ' (' + ', '.join(changes) + ')'
+
+        entry = AdminLog(
+            admin_id=current_user.id,
+            action_type='edit_applicant',
+            action_description=description,
+            email_sent=False,
+            ip_address=request.remote_addr
+        )
+        db.session.add(entry)
+        db.session.commit()
+
+        flash(f'Applicant record updated.', 'success')
+        return redirect(url_for('main.admin_applicants'))
+
+    return render_template('admin/edit_applicant.html', applicant=applicant)
+
+
+@main.route('/admin/applicants/<int:user_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_applicant(user_id):
+    from app.models import AdminLog
+    applicant = User.query.get_or_404(user_id)
+
+    if applicant.is_admin():
+        flash('Administrator accounts cannot be deleted here.', 'danger')
+        return redirect(url_for('main.admin_applicants'))
+
+    name_snapshot = applicant.full_name
+    LoanApplication.query.filter_by(user_id=user_id).delete()
+    db.session.delete(applicant)
+    db.session.commit()
+
+    entry = AdminLog(
+        admin_id=current_user.id,
+        action_type='delete_applicant',
+        action_description=f'Deleted applicant #{user_id} ({name_snapshot}) and all associated records',
+        email_sent=False,
+        ip_address=request.remote_addr
+    )
+    db.session.add(entry)
+    db.session.commit()
+
+    flash(f'Applicant "{name_snapshot}" and all associated applications have been removed.', 'success')
+    return redirect(url_for('main.admin_applicants'))
+
+
+@main.route('/admin/reports')
+@login_required
+@admin_required
+def admin_reports():
+    from app.models import AdminLog
+    from sqlalchemy import func
+
+    total_applications = LoanApplication.query.count()
+    total_users = User.query.filter_by(role='applicant').count()
+
+    eligible_count = Prediction.query.filter_by(predicted_class='Eligible').count()
+    not_eligible_count = Prediction.query.filter_by(predicted_class='Not Eligible').count()
+    under_review_count = Prediction.query.filter_by(predicted_class='Under Review').count()
+
+    approval_rate = round((eligible_count / total_applications * 100), 1) if total_applications > 0 else 0
+    denial_rate = round((not_eligible_count / total_applications * 100), 1) if total_applications > 0 else 0
+    review_rate = round((under_review_count / total_applications * 100), 1) if total_applications > 0 else 0
+
+    avg_loan = db.session.query(func.avg(LoanApplication.loan_amount_requested)).scalar()
+    avg_loan = round(avg_loan, 2) if avg_loan else 0
+
+    max_loan = db.session.query(func.max(LoanApplication.loan_amount_requested)).scalar() or 0
+    min_loan = db.session.query(func.min(LoanApplication.loan_amount_requested)).scalar() or 0
+
+    avg_score = db.session.query(func.avg(Prediction.probability_score)).scalar()
+    avg_score = round(avg_score * 100, 1) if avg_score else 0
+
+    avg_income = db.session.query(func.avg(LoanApplication.monthly_income)).scalar()
+    avg_income = round(avg_income, 2) if avg_income else 0
+
+    employment_breakdown = (
+        db.session.query(LoanApplication.employment_type, func.count(LoanApplication.id))
+        .group_by(LoanApplication.employment_type)
+        .all()
+    )
+
+    education_breakdown = (
+        db.session.query(LoanApplication.education_level, func.count(LoanApplication.id))
+        .group_by(LoanApplication.education_level)
+        .all()
+    )
+
+    status_breakdown = (
+        db.session.query(LoanApplication.status, func.count(LoanApplication.id))
+        .group_by(LoanApplication.status)
+        .all()
+    )
+
+    recent_logs = (
+        AdminLog.query
+        .order_by(AdminLog.timestamp.desc())
+        .limit(10)
+        .all()
+    )
+
+    try:
+        import joblib, os
+        model_path = os.path.join(os.path.dirname(__file__), 'ml', 'model.pkl')
+        model = joblib.load(model_path)
+        model_name = type(model).__name__
+    except Exception:
+        model_name = 'Unknown'
+
+    return render_template(
+        'admin/reports.html',
+        total_applications=total_applications,
+        total_users=total_users,
+        eligible_count=eligible_count,
+        not_eligible_count=not_eligible_count,
+        under_review_count=under_review_count,
+        approval_rate=approval_rate,
+        denial_rate=denial_rate,
+        review_rate=review_rate,
+        avg_loan=avg_loan,
+        max_loan=max_loan,
+        min_loan=min_loan,
+        avg_score=avg_score,
+        avg_income=avg_income,
+        employment_breakdown=employment_breakdown,
+        education_breakdown=education_breakdown,
+        status_breakdown=status_breakdown,
+        recent_logs=recent_logs,
+        model_name=model_name,
+    )
 
 
 @main.route('/predict', methods=['POST'])

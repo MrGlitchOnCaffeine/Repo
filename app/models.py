@@ -49,6 +49,9 @@ class LoanApplication(db.Model):
     monthly_income = db.Column(db.Float, nullable=False)
 
     # Identity
+    # NOTE: BVN and NIN are stored in plaintext for this academic prototype.
+    # In a production system these should be encrypted at rest (e.g. via
+    # SQLAlchemy-Utils EncryptedType or AES encryption before storage).
     bvn_number = db.Column(db.String(11), nullable=False)
     nin_number = db.Column(db.String(11), nullable=False)
     address = db.Column(db.String(200), nullable=False)
