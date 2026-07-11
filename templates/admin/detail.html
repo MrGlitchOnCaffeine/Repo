@@ -139,15 +139,58 @@
                     <div class="p-3">
                         <form method="POST" action="{{ url_for('main.admin_update_application', reference_id=application.reference_id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                             <div class="mb-3">
                                 <label class="form-label">Application Status</label>
                                 <select class="form-select leps-input" name="status">
-                                    <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
-                                    <option value="Processed" {% if application.status == 'Processed' %}selected{% endif %}>Processed</option>
-                                    <option value="Reviewed" {% if application.status == 'Reviewed' %}selected{% endif %}>Reviewed</option>
+                                    <option value="Pending Review"
+                                        {% if application.status == 'Pending Review' %}selected{% endif %}>
+                                        Pending Review
+                                    </option>
+                                    <option value="Under Review"
+                                        {% if application.status == 'Under Review' %}selected{% endif %}>
+                                        Under Review
+                                    </option>
+                                    <option value="Eligible"
+                                        {% if application.status == 'Eligible' %}selected{% endif %}>
+                                        Eligible
+                                    </option>
+                                    <option value="Not Eligible"
+                                        {% if application.status == 'Not Eligible' %}selected{% endif %}>
+                                        Not Eligible
+                                    </option>
+                                    <option value="Requires Additional Information"
+                                        {% if application.status == 'Requires Additional Information' %}selected{% endif %}>
+                                        Requires Additional Information
+                                    </option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-navy w-100">Update Status</button>
+
+                            <div class="mb-3">
+                                <label class="form-label">Administrator Comment <span class="text-muted" style="font-weight:400;">(optional)</span></label>
+                                <textarea
+                                    class="form-control leps-input"
+                                    name="admin_comment"
+                                    rows="3"
+                                    placeholder="Add context or instructions for the applicant..."
+                                >{{ application.admin_comment or '' }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="notify_applicant"
+                                        id="notify_applicant"
+                                    >
+                                    <label class="form-check-label" for="notify_applicant">
+                                        Notify applicant by email
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-navy w-100">Save Status</button>
                         </form>
                     </div>
                 </div>
