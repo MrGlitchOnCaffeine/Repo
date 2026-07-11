@@ -109,32 +109,20 @@ body {
     flex-shrink: 0;
 }
 
-.brand-mark {
-    width: 32px;
-    height: 32px;
-    background-color: var(--saffron);
-    border-radius: var(--r-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.brand-svg {
+    height: 22px;
+    width: auto;
     flex-shrink: 0;
-}
-
-.brand-mark-text {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    font-weight: 500;
-    color: var(--slate);
-    letter-spacing: 0.03em;
-    line-height: 1;
+    display: block;
 }
 
 .brand-full {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: rgba(255,255,255,0.4);
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.35);
     line-height: 1.2;
     max-width: 160px;
+    letter-spacing: 0.01em;
 }
 
 .navbar-toggler {
@@ -330,18 +318,19 @@ body {
 }
 .btn-navy.w-100 { width: 100%; text-align: center; }
 
-.btn-outline-navy,
 .btn-outline-leps {
-    border: 1px solid var(--slate);
+    border: 1.5px solid var(--slate);
     color: var(--slate);
     font-weight: 500;
     border-radius: var(--r);
-    padding: 0.6rem 1.25rem;
+    padding: 0.55rem 1.1rem;
     font-size: 0.875rem;
     background: transparent;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s, color 0.15s;
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -350,8 +339,9 @@ body {
 .btn-outline-navy:hover { background-color: var(--slate); color: #fff; }
 .btn-outline-navy.btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8rem; }
 
-.btn-outline-secondary {
-    border: 1px solid var(--border-mid);
+/* btn-outline-secondary — see global consistency block */
+._btn-outline-secondary-legacy {
+    border: 1.5px solid var(--border-mid);
     color: var(--text-muted);
     font-weight: 500;
     border-radius: var(--r);
@@ -1152,26 +1142,24 @@ button, a, [role="button"] {
 /* ------------------------------------------------------------
    PAGE HEADERS
    ------------------------------------------------------------ */
-.leps-admin-section,
+/* leps-admin-section, page-header/title/subtitle — see global consistency block */
 .leps-history-section,
 .leps-form-section,
 .leps-result-section {
     padding: 2.5rem 0 4rem;
 }
 
-.page-header   { margin-bottom: 2rem; }
 .form-page-header { margin-bottom: 1.75rem; }
 
-.page-title,
 .form-page-title {
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.6rem;
+    font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 0.3rem;
     line-height: 1.15;
 }
 
-.page-subtitle,
 .form-page-subtitle {
     font-size: 0.875rem;
     color: var(--text-muted);
@@ -1608,34 +1596,7 @@ button, a, [role="button"] {
 /* ------------------------------------------------------------
    TABLES
    ------------------------------------------------------------ */
-.leps-table {
-    margin: 0;
-    font-size: 0.875rem;
-    width: 100%;
-}
-
-.leps-table thead th {
-    background-color: var(--slate);
-    color: rgba(255,255,255,0.6);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    padding: 0.85rem 1rem;
-    border: none;
-    white-space: nowrap;
-}
-
-.leps-table tbody td {
-    padding: 0.85rem 1rem;
-    vertical-align: middle;
-    border-bottom: 1px solid var(--border-warm);
-    color: var(--text-body);
-}
-
-.leps-table tbody tr:last-child td { border-bottom: none; }
-.leps-table tbody tr:hover { background-color: var(--off-white); }
+/* leps-table — see global consistency block at end of file */
 
 /* Badges */
 .badge-result {
@@ -1656,46 +1617,14 @@ button, a, [role="button"] {
 .review-badge      { background: var(--review-bg);    color: var(--review);   border: 1px solid var(--review-bd); }
 
 /* Empty state */
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--white);
-    border: 1.5px solid var(--border-warm);
-    border-radius: var(--r-lg);
-    box-shadow: var(--shadow-sm);
-}
-
 .empty-icon  { font-size: 2.5rem; color: var(--border-mid); display: block; margin-bottom: 1rem; }
 .empty-title { font-family: var(--font-display); font-size: 1.25rem; color: var(--text-primary); margin-bottom: 0.5rem; }
-.empty-body  { font-size: 0.875rem; color: var(--text-muted); margin: 0; }
+/* empty-state, empty-body — see global consistency block at end of file */
 
 /* ------------------------------------------------------------
    ADMIN PAGES
    ------------------------------------------------------------ */
-.admin-card {
-    background-color: var(--white);
-    border: 1.5px solid var(--border-warm);
-    border-radius: var(--r-lg);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-}
-
-.admin-card-header {
-    padding: 0.9rem 1.5rem;
-    border-bottom: 1px solid var(--border-warm);
-    background-color: var(--off-white);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.admin-card-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: 0.01em;
-}
+/* admin-card, admin-card-header, admin-card-title — see global consistency block */
 
 /* Stat cards */
 .stat-card {
@@ -1794,8 +1723,7 @@ button, a, [role="button"] {
 
 .back-link:hover { color: var(--slate); }
 
-.admin-card > form { padding: 1.25rem 1.5rem; }
-.admin-card > .p-3 { padding: 1.25rem 1.5rem !important; }
+/* admin-card > form and .p-3 padding — see global consistency block */
 
 /* ------------------------------------------------------------
    PRINT STYLES
@@ -2948,4 +2876,251 @@ button, a, [role="button"] {
     background-color: var(--denied);
     color: #fff;
     border-color: var(--denied);
+}
+
+/* =============================================================
+   GLOBAL BTN-LEPS BASE CLASS
+   Shared base for btn-primary-leps and btn-secondary-leps so
+   inline template definitions are no longer needed.
+   ============================================================= */
+
+.btn-leps {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: var(--r);
+    padding: 0.75rem 1.25rem;
+    min-height: 46px;
+    text-decoration: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    border: 1.5px solid transparent;
+}
+
+/* =============================================================
+   CROSS-PAGE CONSISTENCY — ADMIN PANEL
+   ============================================================= */
+
+/* Uniform section spacing across every admin page */
+.leps-admin-section {
+    padding: 2rem 0 4rem;
+}
+
+/* page-header — consistent across dashboard, applicants, applications, reports */
+.page-header {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-warm);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.2rem;
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* admin-card — uniform across all admin pages */
+.admin-card {
+    background-color: var(--white);
+    border: 1.5px solid var(--border-warm);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xs);
+}
+
+.admin-card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-warm);
+    background-color: var(--off-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-card-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* admin-card form and content padding */
+.admin-card > form {
+    padding: 1.25rem 1.5rem;
+}
+
+.admin-card > .p-3 {
+    padding: 1.25rem 1.5rem !important;
+}
+
+/* Uniform form-label across admin and applicant pages */
+.leps-admin-section .form-label,
+.leps-admin-section label.form-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* Uniform form-text (helper text) */
+.leps-admin-section .form-text {
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    margin-top: 0.3rem;
+}
+
+/* form-check in admin (notify checkbox) */
+.leps-admin-section .form-check-label {
+    font-size: 0.875rem;
+    color: var(--text-body);
+}
+
+.leps-admin-section .form-check-input:checked {
+    background-color: var(--slate);
+    border-color: var(--slate);
+}
+
+/* Textarea in admin */
+.leps-admin-section textarea.form-control.leps-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* btn-outline-secondary — consistent muted style across all pages */
+.btn-outline-secondary {
+    border: 1.5px solid var(--border-mid);
+    color: var(--text-muted);
+    background: transparent;
+    font-weight: 500;
+    border-radius: var(--r);
+    padding: 0.55rem 1.1rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+    cursor: pointer;
+}
+
+.btn-outline-secondary:hover {
+    border-color: var(--slate);
+    color: var(--slate);
+    background-color: var(--off-white);
+}
+
+/* btn-outline-navy — consistent across all pages */
+.btn-outline-navy {
+    border: 1.5px solid var(--slate);
+    color: var(--slate);
+    background: transparent;
+    font-weight: 500;
+    border-radius: var(--r);
+    padding: 0.55rem 1.1rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background-color 0.15s, color 0.15s;
+    cursor: pointer;
+}
+
+.btn-outline-navy:hover {
+    background-color: var(--slate);
+    color: #fff;
+}
+
+.btn-outline-navy.btn-sm {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.78rem;
+}
+
+/* empty-state — consistent across all pages */
+.empty-state {
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.empty-body {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* leps-table — uniform across dashboard, applications, reports */
+.leps-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.leps-table thead th {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-warm);
+    background-color: var(--off-white);
+    white-space: nowrap;
+}
+
+.leps-table tbody td {
+    padding: 0.85rem 1.5rem;
+    border-bottom: 1px solid var(--border-warm);
+    color: var(--text-body);
+    vertical-align: middle;
+}
+
+.leps-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.leps-table tbody tr:hover {
+    background-color: var(--off-white);
+}
+
+/* =============================================================
+   RESPONSIVE OVERRIDES
+   ============================================================= */
+
+@media (max-width: 767.98px) {
+    .page-title { font-size: 1.35rem; }
+    .leps-table thead th { font-size: 0.6rem; padding: 0.65rem 1rem; }
+    .leps-table tbody td { padding: 0.7rem 1rem; font-size: 0.82rem; }
+    .admin-card-header { padding: 0.85rem 1rem; }
+    .admin-card > form { padding: 1rem; }
+    .admin-card > .p-3 { padding: 1rem !important; }
+    .reports-inner { padding: 1rem; }
+    .leps-pagination { padding: 0.85rem 1rem; }
+
+    .brand-svg { height: 19px; }
+    .brand-full { display: none; }
 }
