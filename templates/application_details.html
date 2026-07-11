@@ -558,7 +558,7 @@
                     <div class="footer-actions">
                         <a href="{{ url_for('main.admin_dashboard') if current_user.is_admin() else url_for('main.index') }}" class="btn-leps btn-secondary-leps">Back to Dashboard</a>
                         <a href="{{ url_for('main.application_submitted', reference_id=application.reference_id) }}" class="btn-leps btn-primary-leps">View Submitted Summary</a>
-                        <a href="{{ url_for('main.download_application_pdf', reference_id=application.reference_id) }}"  class="btn btn-outline-navy">Download PDF</a>
+                        #<a href="{{ url_for('main.download_application_pdf', reference_id=application.reference_id) }}"  class="btn btn-outline-navy">Download PDF</a>
                     </div>
                 </div>
             </section>
