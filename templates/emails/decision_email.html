@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Decision</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #F8F5EE;
+            color: #1E2028;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .email-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #EAE4D4;
+        }
+
+        .email-header {
+            background-color: #1E2028;
+            padding: 1.75rem 2rem;
+        }
+
+        .email-header-brand {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #C49A1A;
+            margin-bottom: 0.25rem;
+        }
+
+        .email-header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Status banners */
+        .status-banner {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #EAE4D4;
+        }
+
+        .status-banner.eligible       { background-color: #EBF5EE; }
+        .status-banner.not-eligible   { background-color: #F5EBEA; }
+        .status-banner.under-review   { background-color: #F5EDD6; }
+        .status-banner.pending-review { background-color: #F0F0F5; }
+        .status-banner.needs-info     { background-color: #F5EDD6; }
+
+        .status-banner-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .eligible .status-banner-label       { color: #2D6B40; }
+        .not-eligible .status-banner-label   { color: #8C2A1E; }
+        .under-review .status-banner-label   { color: #7A5200; }
+        .pending-review .status-banner-label { color: #3A3A5C; }
+        .needs-info .status-banner-label     { color: #7A5200; }
+
+        .status-banner-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .eligible .status-banner-text       { color: #2D6B40; }
+        .not-eligible .status-banner-text   { color: #8C2A1E; }
+        .under-review .status-banner-text   { color: #7A5200; }
+        .pending-review .status-banner-text { color: #3A3A5C; }
+        .needs-info .status-banner-text     { color: #7A5200; }
+
+        /* Body */
+        .email-body {
+            padding: 1.75rem 2rem;
+        }
+
+        .greeting {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: #1E2028;
+        }
+
+        .intro-text {
+            font-size: 0.9rem;
+            color: #6B6E7A;
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .details-table td {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid #EAE4D4;
+            vertical-align: top;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            font-weight: 600;
+            color: #1E2028;
+            width: 45%;
+            background-color: #F8F5EE;
+        }
+
+        .detail-value {
+            color: #374151;
+        }
+
+        /* Outcome blocks */
+        .outcome-block {
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .outcome-block.eligible {
+            background-color: #EBF5EE;
+            border: 1px solid #A8D4B4;
+            color: #2D6B40;
+        }
+
+        .outcome-block.not-eligible {
+            background-color: #F5EBEA;
+            border: 1px solid #D4A09A;
+            color: #8C2A1E;
+        }
+
+        .outcome-block.under-review {
+            background-color: #F5EDD6;
+            border: 1px solid #D4B87A;
+            color: #7A5200;
+        }
+
+        .outcome-block.needs-info {
+            background-color: #F5EDD6;
+            border: 1px solid #D4B87A;
+            color: #7A5200;
+        }
+
+        .outcome-block.pending-review {
+            background-color: #F0F0F5;
+            border: 1px solid #C0C0D8;
+            color: #3A3A5C;
+        }
+
+        /* Comment block */
+        .comment-block {
+            background-color: #F8F5EE;
+            border: 1px solid #EAE4D4;
+            border-left: 3px solid #798645;
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comment-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #6B6E7A;
+            margin-bottom: 0.4rem;
+        }
+
+        .comment-text {
+            font-size: 0.9rem;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #EAE4D4;
+            margin: 1.5rem 0;
+        }
+
+        .cta-wrap {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background-color: #798645;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            border-radius: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .email-footer {
+            padding: 1.25rem 2rem;
+            background-color: #F8F5EE;
+            border-top: 1px solid #EAE4D4;
+        }
+
+        .disclaimer {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            line-height: 1.6;
+        }
+
+        .reference-line {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            margin-top: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="email-card">
+
+            <div class="email-header">
+                <p class="email-header-brand">Loan Eligibility Prediction System</p>
+                <p class="email-header-title">Application Status Update</p>
+            </div>
+
+            {% if new_status == 'Eligible' %}
+                <div class="status-banner eligible">
+                    <span class="status-banner-label">Decision</span>
+                    <p class="status-banner-text">Eligible</p>
+                </div>
+            {% elif new_status == 'Not Eligible' %}
+                <div class="status-banner not-eligible">
+                    <span class="status-banner-label">Decision</span>
+                    <p class="status-banner-text">Not Eligible</p>
+                </div>
+            {% elif new_status == 'Under Review' %}
+                <div class="status-banner under-review">
+                    <span class="status-banner-label">Status Update</span>
+                    <p class="status-banner-text">Under Review</p>
+                </div>
+            {% elif new_status == 'Requires Additional Information' %}
+                <div class="status-banner needs-info">
+                    <span class="status-banner-label">Action Required</span>
+                    <p class="status-banner-text">Additional Information Needed</p>
+                </div>
+            {% else %}
+                <div class="status-banner pending-review">
+                    <span class="status-banner-label">Status Update</span>
+                    <p class="status-banner-text">Pending Review</p>
+                </div>
+            {% endif %}
+
+            <div class="email-body">
+
+                <p class="greeting">Dear {{ applicant_name }},</p>
+
+                <p class="intro-text">
+                    This email is to inform you that the status of your loan
+                    eligibility application has been updated.
+                </p>
+
+                <table class="details-table">
+                    <tr>
+                        <td class="detail-key">Reference ID</td>
+                        <td class="detail-value">{{ application.reference_id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Date Submitted</td>
+                        <td class="detail-value">
+                            {{ application.application_date.strftime('%d %B %Y') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Updated Status</td>
+                        <td class="detail-value">{{ new_status }}</td>
+                    </tr>
+                </table>
+
+                {% if new_status == 'Eligible' %}
+                    <div class="outcome-block eligible">
+                        Congratulations. Your application has been reviewed and you have
+                        been found eligible. Please log in to your account to view your
+                        full result and take the next steps in completing your loan process.
+                    </div>
+
+                {% elif new_status == 'Not Eligible' %}
+                    <div class="outcome-block not-eligible">
+                        After careful review, your application was not found to meet the
+                        current eligibility criteria. We encourage you to review your
+                        financial profile and consider reapplying in the future when your
+                        circumstances change.
+                    </div>
+
+                {% elif new_status == 'Under Review' %}
+                    <div class="outcome-block under-review">
+                        Your application is currently being reviewed by our team. No
+                        further action is required from you at this time. You will
+                        receive another email once the review is complete.
+                    </div>
+
+                {% elif new_status == 'Requires Additional Information' %}
+                    <div class="outcome-block needs-info">
+                        Your application requires additional information before it can
+                        be processed further. Please log in to your account and follow
+                        the instructions provided, or refer to the administrator comment
+                        below for specific requirements.
+                    </div>
+
+                {% else %}
+                    <div class="outcome-block pending-review">
+                        Your application has been queued for review. You will receive
+                        a further update once the review process begins. No action is
+                        required from you at this time.
+                    </div>
+                {% endif %}
+
+                {% if admin_comment %}
+                    <div class="comment-block">
+                        <p class="comment-label">Administrator Note</p>
+                        <p class="comment-text">{{ admin_comment }}</p>
+                    </div>
+                {% endif %}
+
+                <hr class="divider">
+
+                <p class="intro-text">
+                    Log in to your account at any time to view your application
+                    details and track any further updates.
+                </p>
+
+                <div class="cta-wrap">
+                    <a href="{{ tracking_url }}" class="cta-btn">View My Application</a>
+                </div>
+
+            </div>
+
+            <div class="email-footer">
+                <p class="disclaimer">
+                    This is an academic demonstration project and does not constitute
+                    a formal financial offer, commitment, or guarantee of any kind.
+                    This system was developed as part of a research portfolio on
+                    machine learning in the Nigerian financial sector.
+                </p>
+                <p class="reference-line">Ref: {{ application.reference_id }}</p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

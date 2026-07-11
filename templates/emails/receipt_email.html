@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Received</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #F8F5EE;
+            color: #1E2028;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .email-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #EAE4D4;
+        }
+
+        .email-header {
+            background-color: #1E2028;
+            padding: 1.75rem 2rem;
+        }
+
+        .email-header-brand {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #C49A1A;
+            margin-bottom: 0.25rem;
+        }
+
+        .email-header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .receipt-banner {
+            background-color: #EBF2F5;
+            border-bottom: 1px solid #EAE4D4;
+            padding: 1.5rem 2rem;
+        }
+
+        .receipt-banner-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #1A4D6B;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .receipt-banner-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1A4D6B;
+        }
+
+        .email-body {
+            padding: 1.75rem 2rem;
+        }
+
+        .greeting {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: #1E2028;
+        }
+
+        .intro-text {
+            font-size: 0.9rem;
+            color: #6B6E7A;
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .details-table td {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid #EAE4D4;
+            vertical-align: top;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            font-weight: 600;
+            color: #1E2028;
+            width: 45%;
+            background-color: #F8F5EE;
+        }
+
+        .detail-value {
+            color: #374151;
+        }
+
+        .ref-block {
+            background-color: #F8F5EE;
+            border: 1px solid #EAE4D4;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ref-block-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #6B6E7A;
+            margin-bottom: 0.3rem;
+        }
+
+        .ref-block-id {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1E2028;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-note {
+            background-color: #F5EDD6;
+            border: 1px solid #D4B87A;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #7A5200;
+            line-height: 1.55;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #EAE4D4;
+            margin: 1.5rem 0;
+        }
+
+        .cta-wrap {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background-color: #798645;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            border-radius: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .email-footer {
+            padding: 1.25rem 2rem;
+            background-color: #F8F5EE;
+            border-top: 1px solid #EAE4D4;
+        }
+
+        .disclaimer {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            line-height: 1.6;
+        }
+
+        .reference-line {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            margin-top: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="email-card">
+
+            <div class="email-header">
+                <p class="email-header-brand">Loan Eligibility Prediction System</p>
+                <p class="email-header-title">Application Received</p>
+            </div>
+
+            <div class="receipt-banner">
+                <span class="receipt-banner-label">Confirmation</span>
+                <p class="receipt-banner-text">Your application has been received.</p>
+            </div>
+
+            <div class="email-body">
+
+                <p class="greeting">Dear {{ applicant_name }},</p>
+
+                <p class="intro-text">
+                    Thank you for submitting your loan eligibility application through
+                    the Loan Eligibility Prediction System. We have received your
+                    submission and it is now under review.
+                </p>
+
+                <div class="ref-block">
+                    <p class="ref-block-label">Reference ID</p>
+                    <p class="ref-block-id">{{ application.reference_id }}</p>
+                </div>
+
+                <table class="details-table">
+                    <tr>
+                        <td class="detail-key">Date Submitted</td>
+                        <td class="detail-value">
+                            {{ application.application_date.strftime('%d %B %Y, %I:%M %p') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Loan Amount Requested</td>
+                        <td class="detail-value">
+                            &#8358;{{ "{:,.0f}".format(application.loan_amount_requested) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-key">Repayment Period</td>
+                        <td class="detail-value">{{ application.loan_tenure_months }} months</td>
+                    </tr>
+                </table>
+
+                <div class="status-note">
+                    Our team is now reviewing your application. You will receive a
+                    separate email once a final decision has been made. No further
+                    action is required from you at this time.
+                </div>
+
+                <hr class="divider">
+
+                <p class="intro-text">
+                    You can log in to your account at any time to track your
+                    application status or review your submission details.
+                </p>
+
+                <div class="cta-wrap">
+                    <a href="{{ tracking_url }}" class="cta-btn">Track My Application</a>
+                </div>
+
+            </div>
+
+            <div class="email-footer">
+                <p class="disclaimer">
+                    This is an academic demonstration project and does not constitute
+                    a formal financial offer, commitment, or guarantee of any kind.
+                    This system was developed as part of a research portfolio on
+                    machine learning in the Nigerian financial sector.
+                </p>
+                <p class="reference-line">Ref: {{ application.reference_id }}</p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
