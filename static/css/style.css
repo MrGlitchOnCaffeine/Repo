@@ -2485,4 +2485,26 @@ button, a, [role="button"] {
         width:100%;
     }
 
+}.field-error-message {
+    display: none;
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--denied);
+    font-weight: 600;
+}
+
+.is-invalid {
+    border-color: var(--denied) !important;
+    box-shadow: 0 0 0 0.15rem rgba(140, 42, 30, 0.12) !important;
+}
+
+.is-invalid:focus {
+    border-color: var(--denied) !important;
+    box-shadow: 0 0 0 0.15rem rgba(140, 42, 30, 0.16) !important;
+}
+
+#leps-loading-overlay .loading-label {
+    min-height: 1.2rem;
+    text-align: center;
 }
