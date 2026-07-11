@@ -1,11 +1,13 @@
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, LoanApplication, Prediction
 from app.validators import validate_application
 from app.decision_engine import evaluate
 from app.pdf_generator import generate_application_pdf
+import json
+
 
 def generate_reference_id():
     from datetime import date
