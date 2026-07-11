@@ -2697,3 +2697,255 @@ button, a, [role="button"] {
     min-height: 1.2rem;
     text-align: center;
 }
+
+/* =============================================================
+   REPORTS PAGE
+   ============================================================= */
+
+.reports-inner {
+    padding: 1.25rem 1.5rem;
+}
+
+/* Eligibility breakdown bars */
+.reports-breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+}
+
+.reports-breakdown-row:last-child {
+    margin-bottom: 0;
+}
+
+.reports-breakdown-label {
+    flex: 0 0 110px;
+}
+
+.reports-breakdown-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background-color: var(--border-warm);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.reports-breakdown-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    min-width: 2px;
+}
+
+.reports-bar-eligible { background-color: var(--eligible); }
+.reports-bar-denied   { background-color: var(--denied); }
+.reports-bar-review   { background-color: var(--review); }
+
+.reports-breakdown-count {
+    flex: 0 0 80px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.reports-breakdown-pct {
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 0.2rem;
+}
+
+/* Metric list */
+.reports-metric-list {
+    margin: 0;
+}
+
+.reports-metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-warm);
+}
+
+.reports-metric-row:last-child {
+    border-bottom: none;
+}
+
+.reports-metric-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.reports-metric-value {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Tag rows for status/employment/education breakdowns */
+.reports-tag-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border-warm);
+}
+
+.reports-tag-row:last-child {
+    border-bottom: none;
+}
+
+.reports-tag-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.reports-tag-count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.reports-empty-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Model performance blocks */
+.reports-model-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.85rem 1rem;
+    background-color: var(--off-white);
+    border: 1.5px solid var(--border-warm);
+    border-radius: var(--r-md);
+}
+
+.reports-model-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.reports-model-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.reports-model-note {
+    margin-top: 1.25rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    padding: 0.75rem 1rem;
+    background-color: var(--off-white);
+    border: 1px solid var(--border-warm);
+    border-radius: var(--r-md);
+}
+
+.reports-no-email {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+/* =============================================================
+   PAGINATION
+   ============================================================= */
+
+.leps-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-warm);
+}
+
+.leps-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--border-mid);
+    color: var(--text-primary);
+    background-color: var(--white);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.leps-page-btn:hover {
+    background-color: var(--slate);
+    border-color: var(--slate);
+    color: #fff;
+}
+
+.leps-page-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+    cursor: default;
+}
+
+.leps-page-info {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* =============================================================
+   ADMIN DANGER ZONE (edit applicant)
+   ============================================================= */
+
+.admin-danger-card {
+    border-color: var(--denied-bd);
+}
+
+.admin-danger-header {
+    background-color: var(--denied-bg);
+    border-bottom-color: var(--denied-bd);
+}
+
+.admin-danger-header .admin-card-title {
+    color: var(--denied);
+}
+
+.admin-danger-body {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.btn-danger-leps {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background-color: var(--denied-bg);
+    color: var(--denied);
+    border: 1.5px solid var(--denied-bd);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    text-decoration: none;
+}
+
+.btn-danger-leps:hover {
+    background-color: var(--denied);
+    color: #fff;
+    border-color: var(--denied);
+}
