@@ -320,20 +320,35 @@ def admin_update_application(reference_id):
         application.admin_comment = admin_comment
         db.session.commit()
 
+        import logging
+        import traceback
+        admin_logger = logging.getLogger(__name__)
+
         email_sent = False
         if notify_applicant:
-            applicant = application.user if hasattr(application, 'user') else None
-            if not applicant:
-                from app.models import User
-                applicant = User.query.get(application.user_id)
+            try:
+                applicant = application.user if hasattr(application, 'user') else None
+                if not applicant:
+                    from app.models import User
+                    applicant = User.query.get(application.user_id)
 
-            if applicant:
-                email_sent = send_decision_email(
-                    to_email=applicant.email,
-                    applicant_name=applicant.full_name,
-                    application=application,
-                    new_status=new_status,
-                    admin_comment=admin_comment
+                if applicant:
+                    email_sent = send_decision_email(
+                        to_email=applicant.email,
+                        applicant_name=applicant.full_name,
+                        application=application,
+                        new_status=new_status,
+                        admin_comment=admin_comment
+                    )
+                else:
+                    admin_logger.warning(
+                        'Could not find applicant for application %s to send decision email',
+                        reference_id
+                    )
+            except Exception:
+                admin_logger.error(
+                    'Error sending decision email for %s:\n%s',
+                    reference_id, traceback.format_exc()
                 )
 
         entry = AdminLog(
@@ -599,6 +614,12 @@ def predict():
 
     reference_id = generate_reference_id()
 
+    import json
+    import logging
+    import traceback
+
+    predict_logger = logging.getLogger(__name__)
+
     application = LoanApplication(
         reference_id=reference_id,
         user_id=current_user.id,
@@ -618,12 +639,11 @@ def predict():
         loan_tenure_months=data['loan_tenure_months'],
         existing_loan_defaults=data['existing_loan_defaults'],
         existing_loan_amount=data['existing_loan_amount'],
-        status='Pending'
+        status='Pending Review'
     )
     db.session.add(application)
     db.session.flush()
 
-    import json
     prediction = Prediction(
         application_id=application.id,
         predicted_class=result['predicted_class'],
@@ -636,6 +656,13 @@ def predict():
     db.session.add(prediction)
     db.session.commit()
 
+    predict_logger.info(
+        'Application %s committed to database for user %s',
+        reference_id, current_user.id
+    )
+
+    # Email is secondary — a failure here must never prevent the JSON response
+    # from reaching the client. send_receipt_email logs its own traceback.
     try:
         from app.email_service import send_receipt_email
         send_receipt_email(
@@ -644,7 +671,10 @@ def predict():
             application=application
         )
     except Exception:
-        pass
+        predict_logger.error(
+            'Unexpected error calling send_receipt_email for %s:\n%s',
+            reference_id, traceback.format_exc()
+        )
 
     return jsonify({
         'application_id': reference_id,

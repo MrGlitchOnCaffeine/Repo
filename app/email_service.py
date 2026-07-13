@@ -1,37 +1,46 @@
+import logging
+import traceback
+
 from flask import render_template, url_for
 from flask_mail import Message
 from app import mail
 
+logger = logging.getLogger(__name__)
+
 
 def send_receipt_email(to_email: str, applicant_name: str, application):
     """
-    Sends a confirmation email immediately after an application is submitted.
-
-    Parameters:
-        to_email       - the applicant's registered email address
-        applicant_name - the applicant's full name
-        application    - the LoanApplication database record
+    Sends a confirmation email after an application is submitted.
+    Returns True on success, False on failure. Never raises.
     """
     subject = f'Application Received - {application.reference_id}'
 
-    tracking_url = url_for(
-        'main.application_details',
-        reference_id=application.reference_id,
-        _external=True
-    )
-
-    msg = Message(subject=subject, recipients=[to_email])
-    msg.html = render_template(
-        'emails/receipt_email.html',
-        applicant_name=applicant_name,
-        application=application,
-        tracking_url=tracking_url
-    )
-
     try:
+        tracking_url = url_for(
+            'main.application_details',
+            reference_id=application.reference_id,
+            _external=True
+        )
+
+        msg = Message(subject=subject, recipients=[to_email])
+        msg.html = render_template(
+            'emails/receipt_email.html',
+            applicant_name=applicant_name,
+            application=application,
+            tracking_url=tracking_url
+        )
+
         mail.send(msg)
+        logger.info('Receipt email sent to %s for %s', to_email, application.reference_id)
         return True
+
     except Exception:
+        logger.error(
+            'Failed to send receipt email for %s to %s:\n%s',
+            application.reference_id,
+            to_email,
+            traceback.format_exc()
+        )
         return False
 
 
@@ -44,62 +53,65 @@ def send_decision_email(
 ):
     """
     Sends a status decision email after an administrator updates an application.
-
-    Parameters:
-        to_email       - the applicant's registered email address
-        applicant_name - the applicant's full name
-        application    - the LoanApplication database record
-        new_status     - the new status set by the administrator
-        admin_comment  - optional administrator comment to include in the email
+    Returns True on success, False on failure. Never raises.
     """
     subject = f'Application Update - {application.reference_id}'
 
-    tracking_url = url_for(
-        'main.application_details',
-        reference_id=application.reference_id,
-        _external=True
-    )
-
-    msg = Message(subject=subject, recipients=[to_email])
-    msg.html = render_template(
-        'emails/decision_email.html',
-        applicant_name=applicant_name,
-        application=application,
-        new_status=new_status,
-        admin_comment=admin_comment,
-        tracking_url=tracking_url
-    )
-
     try:
+        tracking_url = url_for(
+            'main.application_details',
+            reference_id=application.reference_id,
+            _external=True
+        )
+
+        msg = Message(subject=subject, recipients=[to_email])
+        msg.html = render_template(
+            'emails/decision_email.html',
+            applicant_name=applicant_name,
+            application=application,
+            new_status=new_status,
+            admin_comment=admin_comment,
+            tracking_url=tracking_url
+        )
+
         mail.send(msg)
+        logger.info(
+            'Decision email sent to %s for %s (status: %s)',
+            to_email, application.reference_id, new_status
+        )
         return True
+
     except Exception:
+        logger.error(
+            'Failed to send decision email for %s to %s:\n%s',
+            application.reference_id,
+            to_email,
+            traceback.format_exc()
+        )
         return False
 
 
 def send_result_email(to_email: str, applicant_name: str, application, prediction):
     """
-    Sends the ML eligibility result email to the applicant.
-    Retained for backwards compatibility but not used in the primary flow.
-
-    Parameters:
-        to_email       - the applicant's registered email address
-        applicant_name - the applicant's full name
-        application    - the LoanApplication database record
-        prediction     - the Prediction database record
+    Retained for backwards compatibility. Not used in the primary workflow.
     """
     subject = f'Your Loan Eligibility Result - {application.reference_id}'
 
-    msg = Message(subject=subject, recipients=[to_email])
-    msg.html = render_template(
-        'emails/result_email.html',
-        applicant_name=applicant_name,
-        application=application,
-        prediction=prediction
-    )
-
     try:
+        msg = Message(subject=subject, recipients=[to_email])
+        msg.html = render_template(
+            'emails/result_email.html',
+            applicant_name=applicant_name,
+            application=application,
+            prediction=prediction
+        )
         mail.send(msg)
         return True
+
     except Exception:
+        logger.error(
+            'Failed to send result email for %s:\n%s',
+            application.reference_id,
+            traceback.format_exc()
+        )
         return False

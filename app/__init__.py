@@ -52,11 +52,12 @@ def create_app(config_name='default'):
     mail.init_app(app)
     csrf.init_app(app)
 
-    from app.routes import predict
-    csrf.exempt(predict)
-
     from app.routes import main
     app.register_blueprint(main)
+
+    # Exempt the predict endpoint after blueprint registration so the
+    # exempt binds to the fully qualified view function the blueprint exposes.
+    csrf.exempt(app.view_functions['main.predict'])
 
     with app.app_context():
         db.create_all()
