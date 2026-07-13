@@ -47,28 +47,42 @@ def send_receipt_email(to_email: str, applicant_name: str, application):
 def send_decision_email(
     to_email: str,
     applicant_name: str,
-    application,
     new_status: str,
-    admin_comment: str = None
+    admin_comment: str = None,
+    application=None,
+    application_ref: str = None,
 ):
     """
     Sends a status decision email after an administrator updates an application.
+
+    Pass either `application` (ORM object, only safe on the main thread) or
+    `application_ref` (reference_id string, safe to pass across threads).
     Returns True on success, False on failure. Never raises.
     """
-    subject = f'Application Update - {application.reference_id}'
+    ref_id = application_ref or (application.reference_id if application else 'unknown')
+    subject = f'Application Update - {ref_id}'
 
     try:
         tracking_url = url_for(
             'main.application_details',
-            reference_id=application.reference_id,
+            reference_id=ref_id,
             _external=True
         )
+
+        # Build a minimal context object so the template works whether we have
+        # the full ORM object or just the reference string.
+        class _AppProxy:
+            def __init__(self, ref):
+                self.reference_id = ref
+                self.application_date = None
+
+        template_app = application if application is not None else _AppProxy(ref_id)
 
         msg = Message(subject=subject, recipients=[to_email])
         msg.html = render_template(
             'emails/decision_email.html',
             applicant_name=applicant_name,
-            application=application,
+            application=template_app,
             new_status=new_status,
             admin_comment=admin_comment,
             tracking_url=tracking_url
@@ -77,14 +91,14 @@ def send_decision_email(
         mail.send(msg)
         logger.info(
             'Decision email sent to %s for %s (status: %s)',
-            to_email, application.reference_id, new_status
+            to_email, ref_id, new_status
         )
         return True
 
     except Exception:
         logger.error(
             'Failed to send decision email for %s to %s:\n%s',
-            application.reference_id,
+            ref_id,
             to_email,
             traceback.format_exc()
         )

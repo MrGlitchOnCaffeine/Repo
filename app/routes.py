@@ -315,41 +315,15 @@ def admin_update_application(reference_id):
     valid_results = ['Eligible', 'Not Eligible', 'Under Review']
 
     if new_status and new_status in valid_statuses:
+        import logging
+        import traceback
+        import threading
+        from flask import copy_current_request_context
+        admin_logger = logging.getLogger(__name__)
+
         old_status = application.status
         application.status = new_status
         application.admin_comment = admin_comment
-        db.session.commit()
-
-        import logging
-        import traceback
-        admin_logger = logging.getLogger(__name__)
-
-        email_sent = False
-        if notify_applicant:
-            try:
-                applicant = application.user if hasattr(application, 'user') else None
-                if not applicant:
-                    from app.models import User
-                    applicant = User.query.get(application.user_id)
-
-                if applicant:
-                    email_sent = send_decision_email(
-                        to_email=applicant.email,
-                        applicant_name=applicant.full_name,
-                        application=application,
-                        new_status=new_status,
-                        admin_comment=admin_comment
-                    )
-                else:
-                    admin_logger.warning(
-                        'Could not find applicant for application %s to send decision email',
-                        reference_id
-                    )
-            except Exception:
-                admin_logger.error(
-                    'Error sending decision email for %s:\n%s',
-                    reference_id, traceback.format_exc()
-                )
 
         entry = AdminLog(
             admin_id=current_user.id,
@@ -357,15 +331,65 @@ def admin_update_application(reference_id):
             action_description=(
                 f'Updated status of {reference_id} from {old_status} to {new_status}'
             ),
-            email_sent=email_sent,
+            email_sent=False,
             ip_address=request.remote_addr
         )
         db.session.add(entry)
         db.session.commit()
 
+        # Fire email on a background thread so the HTTP response returns
+        # immediately. The DB commit is already done above — email outcome
+        # cannot affect it. copy_current_request_context carries the Flask
+        # app/request context into the thread so url_for and render_template
+        # work correctly without a RuntimeError.
+        if notify_applicant:
+            from app.models import User
+            applicant = application.user if hasattr(application, 'user') else None
+            if not applicant:
+                applicant = User.query.get(application.user_id)
+
+            if applicant:
+                # Snapshot values now — do not pass ORM objects into the thread
+                # because the SQLAlchemy session is not thread-safe.
+                _to_email       = applicant.email
+                _applicant_name = applicant.full_name
+                _ref_id         = application.reference_id
+                _new_status     = new_status
+                _admin_comment  = admin_comment
+                _log_entry_id   = entry.id
+
+                @copy_current_request_context
+                def _send_in_background():
+                    try:
+                        from app.email_service import send_decision_email
+                        from app import db as _db
+                        from app.models import AdminLog as _AdminLog
+                        sent = send_decision_email(
+                            to_email=_to_email,
+                            applicant_name=_applicant_name,
+                            application_ref=_ref_id,
+                            new_status=_new_status,
+                            admin_comment=_admin_comment
+                        )
+                        if sent and _log_entry_id:
+                            log = _AdminLog.query.get(_log_entry_id)
+                            if log:
+                                log.email_sent = True
+                                _db.session.commit()
+                    except Exception:
+                        admin_logger.error(
+                            'Background email thread failed for %s:\n%s',
+                            _ref_id, traceback.format_exc()
+                        )
+
+                t = threading.Thread(target=_send_in_background, daemon=True)
+                t.start()
+            else:
+                admin_logger.warning(
+                    'Could not find applicant for %s — notification not sent', reference_id
+                )
+
         flash(f'Status updated to {new_status}.', 'success')
-        if notify_applicant and not email_sent:
-            flash('Status saved but the notification email could not be sent.', 'warning')
 
     if override_result and override_result in valid_results and application.prediction:
         old_result = application.prediction.predicted_class
