@@ -318,7 +318,6 @@ def admin_update_application(reference_id):
         import logging
         import traceback
         import threading
-        from flask import copy_current_request_context
         admin_logger = logging.getLogger(__name__)
 
         old_status = application.status
@@ -338,19 +337,23 @@ def admin_update_application(reference_id):
         db.session.commit()
 
         # Fire email on a background thread so the HTTP response returns
-        # immediately. The DB commit is already done above — email outcome
-        # cannot affect it. copy_current_request_context carries the Flask
-        # app/request context into the thread so url_for and render_template
-        # work correctly without a RuntimeError.
+        # immediately. DB commit is already done — email outcome cannot affect it.
+        #
+        # We do NOT use copy_current_request_context here. On Render with a
+        # single worker the request context is torn down before the thread
+        # runs, causing a deadlock. Instead we grab the real app object with
+        # _get_current_object() before the thread starts, then push a fresh
+        # app context inside the thread ourselves.
         if notify_applicant:
+            from flask import current_app
             from app.models import User
             applicant = application.user if hasattr(application, 'user') else None
             if not applicant:
                 applicant = User.query.get(application.user_id)
 
             if applicant:
-                # Snapshot values now — do not pass ORM objects into the thread
-                # because the SQLAlchemy session is not thread-safe.
+                # Snapshot plain values — ORM objects must not cross thread boundary.
+                _app            = current_app._get_current_object()
                 _to_email       = applicant.email
                 _applicant_name = applicant.full_name
                 _ref_id         = application.reference_id
@@ -358,29 +361,29 @@ def admin_update_application(reference_id):
                 _admin_comment  = admin_comment
                 _log_entry_id   = entry.id
 
-                @copy_current_request_context
                 def _send_in_background():
-                    try:
-                        from app.email_service import send_decision_email
-                        from app import db as _db
-                        from app.models import AdminLog as _AdminLog
-                        sent = send_decision_email(
-                            to_email=_to_email,
-                            applicant_name=_applicant_name,
-                            application_ref=_ref_id,
-                            new_status=_new_status,
-                            admin_comment=_admin_comment
-                        )
-                        if sent and _log_entry_id:
-                            log = _AdminLog.query.get(_log_entry_id)
-                            if log:
-                                log.email_sent = True
-                                _db.session.commit()
-                    except Exception:
-                        admin_logger.error(
-                            'Background email thread failed for %s:\n%s',
-                            _ref_id, traceback.format_exc()
-                        )
+                    with _app.app_context():
+                        try:
+                            from app.email_service import send_decision_email
+                            from app import db as _db
+                            from app.models import AdminLog as _AdminLog
+                            sent = send_decision_email(
+                                to_email=_to_email,
+                                applicant_name=_applicant_name,
+                                application_ref=_ref_id,
+                                new_status=_new_status,
+                                admin_comment=_admin_comment
+                            )
+                            if sent and _log_entry_id:
+                                log = _AdminLog.query.get(_log_entry_id)
+                                if log:
+                                    log.email_sent = True
+                                    _db.session.commit()
+                        except Exception:
+                            admin_logger.error(
+                                'Background email thread failed for %s:\n%s',
+                                _ref_id, traceback.format_exc()
+                            )
 
                 t = threading.Thread(target=_send_in_background, daemon=True)
                 t.start()
