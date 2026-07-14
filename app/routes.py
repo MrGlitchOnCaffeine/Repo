@@ -662,43 +662,89 @@ def admin_smtp_diagnostic():
         )
     })
 
-    # Stage 1: raw TCP connect — this is what a blocked port fails at
-    sock = None
-    t0 = time.time()
+    # Stage 1: DNS resolution — report every address returned, both families
     try:
-        sock = socket.create_connection((server, port), timeout=10)
-        elapsed = round(time.time() - t0, 2)
+        addr_infos = socket.getaddrinfo(server, port, proto=socket.IPPROTO_TCP)
+        seen = set()
+        addr_list = []
+        for family, _, _, _, sockaddr in addr_infos:
+            ip = sockaddr[0]
+            fam_name = 'IPv6' if family == socket.AF_INET6 else 'IPv4'
+            key = (fam_name, ip)
+            if key not in seen:
+                seen.add(key)
+                addr_list.append((fam_name, ip, family))
+
         stages.append({
-            'stage': '1. Raw TCP connect',
-            'result': 'SUCCESS',
-            'detail': f'Connected to {server}:{port} in {elapsed}s'
+            'stage': '1. DNS resolution',
+            'result': 'INFO',
+            'detail': 'Resolved to: ' + ', '.join(f'{fam} {ip}' for fam, ip, _ in addr_list)
         })
-    except socket.timeout:
-        elapsed = round(time.time() - t0, 2)
+    except Exception as e:
         stages.append({
-            'stage': '1. Raw TCP connect',
-            'result': 'TIMEOUT',
+            'stage': '1. DNS resolution',
+            'result': 'FAILED',
+            'detail': f'{type(e).__name__}: {e}'
+        })
+        return _render_smtp_diagnostic(stages)
+
+    # Stage 2: try each resolved address individually, IPv4 and IPv6 separately.
+    # This tells us definitively whether this is a routing/IPv6 issue (one
+    # family fails, the other succeeds) versus a genuine full block (every
+    # address, every family, fails the same way).
+    sock = None
+    working_family = None
+    for fam_name, ip, family in addr_list:
+        t0 = time.time()
+        try:
+            s = socket.socket(family, socket.SOCK_STREAM)
+            s.settimeout(8)
+            s.connect((ip, port))
+            elapsed = round(time.time() - t0, 2)
+            stages.append({
+                'stage': f'2. Connect via {fam_name} ({ip})',
+                'result': 'SUCCESS',
+                'detail': f'Connected in {elapsed}s'
+            })
+            sock = s
+            working_family = fam_name
+            break
+        except socket.timeout:
+            elapsed = round(time.time() - t0, 2)
+            stages.append({
+                'stage': f'2. Connect via {fam_name} ({ip})',
+                'result': 'TIMEOUT',
+                'detail': f'No response after {elapsed}s — packets likely being silently dropped.'
+            })
+        except OSError as e:
+            elapsed = round(time.time() - t0, 2)
+            stages.append({
+                'stage': f'2. Connect via {fam_name} ({ip})',
+                'result': 'FAILED',
+                'detail': f'{type(e).__name__}: {e} (after {elapsed}s)'
+            })
+
+    if sock is None:
+        stages.append({
+            'stage': '2. Summary',
+            'result': 'ALL FAILED',
             'detail': (
-                f'No response from {server}:{port} after {elapsed}s. '
-                f'This is the exact signature of a firewall silently '
-                f'dropping the connection (e.g. a blocked outbound port). '
-                f'Stopping here — later stages cannot run.'
+                'Every resolved address failed, across all address families. '
+                'This is consistent with the port itself being blocked at '
+                'the network level for every route out.'
             )
         })
         return _render_smtp_diagnostic(stages)
-    except (ConnectionRefusedError, OSError) as e:
-        elapsed = round(time.time() - t0, 2)
+    else:
         stages.append({
-            'stage': '1. Raw TCP connect',
-            'result': 'REFUSED',
+            'stage': '2. Summary',
+            'result': 'INFO',
             'detail': (
-                f'Connection actively refused after {elapsed}s: {e}. '
-                f'This is different from a silent block — the network '
-                f'reached the destination but the port refused entry. '
-                f'Stopping here — later stages cannot run.'
+                f'Connection succeeded via {working_family}. If another '
+                f'family failed above, this was a routing issue for that '
+                f'family specifically, not a full port block.'
             )
         })
-        return _render_smtp_diagnostic(stages)
 
     # Stage 2: STARTTLS handshake — only reached if TCP connect succeeded
     try:
@@ -708,13 +754,13 @@ def admin_smtp_diagnostic():
         smtp.helo()
         smtp.starttls()
         stages.append({
-            'stage': '2. STARTTLS handshake',
+            'stage': '3. STARTTLS handshake',
             'result': 'SUCCESS',
             'detail': 'TLS negotiation completed successfully.'
         })
     except Exception as e:
         stages.append({
-            'stage': '2. STARTTLS handshake',
+            'stage': '3. STARTTLS handshake',
             'result': 'FAILED',
             'detail': f'{type(e).__name__}: {e}'
         })
@@ -724,20 +770,20 @@ def admin_smtp_diagnostic():
     try:
         if not username or not password:
             stages.append({
-                'stage': '3. Authentication',
+                'stage': '4. Authentication',
                 'result': 'SKIPPED',
                 'detail': 'MAIL_USERNAME or MAIL_PASSWORD not set — cannot test login.'
             })
         else:
             smtp.login(username, password)
             stages.append({
-                'stage': '3. Authentication',
+                'stage': '4. Authentication',
                 'result': 'SUCCESS',
                 'detail': f'Logged in as {username}. SMTP is fully functional end-to-end.'
             })
     except smtplib.SMTPAuthenticationError as e:
         stages.append({
-            'stage': '3. Authentication',
+            'stage': '4. Authentication',
             'result': 'FAILED',
             'detail': (
                 f'{e}. If using Gmail, this usually means an App Password '
@@ -747,7 +793,7 @@ def admin_smtp_diagnostic():
         })
     except Exception as e:
         stages.append({
-            'stage': '3. Authentication',
+            'stage': '4. Authentication',
             'result': 'FAILED',
             'detail': f'{type(e).__name__}: {e}'
         })
