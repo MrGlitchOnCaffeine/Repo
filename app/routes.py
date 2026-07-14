@@ -316,13 +316,42 @@ def admin_update_application(reference_id):
 
     if new_status and new_status in valid_statuses:
         import logging
-        import traceback
-        import threading
         admin_logger = logging.getLogger(__name__)
 
         old_status = application.status
         application.status = new_status
         application.admin_comment = admin_comment
+        db.session.commit()
+
+        # Email is sent synchronously here, deliberately — this mirrors the
+        # send_receipt_email call in the /predict route, which is proven to
+        # work. Background threading was tried and repeatedly caused the
+        # entire worker to hang: this app runs with gunicorn preload_app,
+        # and forking a process that already has live ML-library thread
+        # pools (scikit-learn/XGBoost via OpenBLAS/OpenMP) corrupts thread
+        # state for any threading.Thread created afterward. See
+        # gunicorn.conf.py for the preload_app fix. email_service.py also
+        # now enforces a 15s socket timeout so a slow/hung SMTP connection
+        # can never block the request indefinitely again.
+        email_sent = False
+        if notify_applicant:
+            from app.models import User
+            applicant = application.user if hasattr(application, 'user') else None
+            if not applicant:
+                applicant = User.query.get(application.user_id)
+
+            if applicant:
+                email_sent = send_decision_email(
+                    to_email=applicant.email,
+                    applicant_name=applicant.full_name,
+                    application=application,
+                    new_status=new_status,
+                    admin_comment=admin_comment
+                )
+            else:
+                admin_logger.warning(
+                    'Could not find applicant for %s — notification not sent', reference_id
+                )
 
         entry = AdminLog(
             admin_id=current_user.id,
@@ -330,79 +359,15 @@ def admin_update_application(reference_id):
             action_description=(
                 f'Updated status of {reference_id} from {old_status} to {new_status}'
             ),
-            email_sent=False,
+            email_sent=email_sent,
             ip_address=request.remote_addr
         )
         db.session.add(entry)
         db.session.commit()
 
-        # Fire email on a background thread so the HTTP response returns
-        # immediately. DB commit is already done — email outcome cannot affect it.
-        #
-        # We do NOT use copy_current_request_context here. On Render with a
-        # single worker the request context is torn down before the thread
-        # runs, causing a deadlock. Instead we grab the real app object with
-        # _get_current_object() before the thread starts, then push a fresh
-        # app context inside the thread ourselves.
-        if notify_applicant:
-            from flask import current_app
-            from app.models import User
-            applicant = application.user if hasattr(application, 'user') else None
-            if not applicant:
-                applicant = User.query.get(application.user_id)
-
-            if applicant:
-                # All values snapshotted as plain strings here, in the main
-                # thread while the request context is still active.
-                # The thread receives no ORM objects and makes no DB calls —
-                # this eliminates SQLite contention and context-related deadlocks.
-                _app            = current_app._get_current_object()
-                _to_email       = applicant.email
-                _applicant_name = applicant.full_name
-                _ref_id         = application.reference_id
-                _new_status     = new_status
-                _admin_comment  = admin_comment
-
-                # Build tracking URL here while request context exists.
-                # url_for(_external=True) inside a thread without a request
-                # context raises RuntimeError — generating it now avoids that.
-                try:
-                    _tracking_url = url_for(
-                        'main.application_details',
-                        reference_id=application.reference_id,
-                        _external=True
-                    )
-                except Exception:
-                    _tracking_url = None
-
-                def _send_in_background():
-                    with _app.app_context():
-                        try:
-                            from app.email_service import send_decision_email
-                            send_decision_email(
-                                to_email=_to_email,
-                                applicant_name=_applicant_name,
-                                application_ref=_ref_id,
-                                new_status=_new_status,
-                                admin_comment=_admin_comment,
-                                tracking_url=_tracking_url
-                            )
-                        except Exception:
-                            import logging as _logging
-                            import traceback as _tb
-                            _logging.getLogger(__name__).error(
-                                'Background email thread failed for %s:\n%s',
-                                _ref_id, _tb.format_exc()
-                            )
-
-                t = threading.Thread(target=_send_in_background, daemon=True)
-                t.start()
-            else:
-                admin_logger.warning(
-                    'Could not find applicant for %s — notification not sent', reference_id
-                )
-
         flash(f'Status updated to {new_status}.', 'success')
+        if notify_applicant and not email_sent:
+            flash('Status saved, but the notification email could not be sent.', 'warning')
 
     if override_result and override_result in valid_results and application.prediction:
         old_result = application.prediction.predicted_class

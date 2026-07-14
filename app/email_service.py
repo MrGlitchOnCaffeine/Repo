@@ -1,4 +1,6 @@
+import contextlib
 import logging
+import socket
 import traceback
 
 from flask import render_template, url_for
@@ -6,6 +8,26 @@ from flask_mail import Message
 from app import mail
 
 logger = logging.getLogger(__name__)
+
+# Flask-Mail 0.10.0 calls smtplib.SMTP(server, port) with no timeout
+# argument, so a connection that hangs (common on cloud egress to Gmail's
+# SMTP port) blocks forever with no exception ever raised. smtplib falls
+# back to the interpreter's global default socket timeout when none is
+# passed explicitly, so we set that default for the duration of the send
+# call only, then restore it — guaranteeing every SMTP call in this module
+# raises socket.timeout instead of hanging indefinitely, without affecting
+# unrelated sockets elsewhere in the app.
+_MAIL_SOCKET_TIMEOUT_SECONDS = 15
+
+
+@contextlib.contextmanager
+def _mail_socket_timeout():
+    previous = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(_MAIL_SOCKET_TIMEOUT_SECONDS)
+    try:
+        yield
+    finally:
+        socket.setdefaulttimeout(previous)
 
 
 def send_receipt_email(to_email: str, applicant_name: str, application):
@@ -30,9 +52,18 @@ def send_receipt_email(to_email: str, applicant_name: str, application):
             tracking_url=tracking_url
         )
 
-        mail.send(msg)
+        with _mail_socket_timeout():
+            mail.send(msg)
+
         logger.info('Receipt email sent to %s for %s', to_email, application.reference_id)
         return True
+
+    except socket.timeout:
+        logger.error(
+            'Receipt email to %s for %s timed out after %ss (SMTP connection hung)',
+            to_email, application.reference_id, _MAIL_SOCKET_TIMEOUT_SECONDS
+        )
+        return False
 
     except Exception:
         logger.error(
@@ -56,19 +87,17 @@ def send_decision_email(
     """
     Sends a status decision email after an administrator updates an application.
 
-    Pass either `application` (ORM object, main thread only) or
-    `application_ref` (reference_id string, safe across threads).
-    Pass `tracking_url` as a pre-built string when calling from a background
-    thread — url_for(_external=True) requires a request context which threads
-    do not have.
+    This is called synchronously on the main request thread, deliberately —
+    the same pattern already proven to work for send_receipt_email. No
+    background threading is used here. See gunicorn.conf.py for why
+    threading combined with preload_app caused the previous hangs.
+
     Returns True on success, False on failure. Never raises.
     """
     ref_id = application_ref or (application.reference_id if application else 'unknown')
     subject = f'Application Update - {ref_id}'
 
     try:
-        # Use the pre-built URL if provided. Fall back to url_for only when
-        # called from the main request thread where a request context exists.
         if tracking_url is None:
             tracking_url = url_for(
                 'main.application_details',
@@ -94,12 +123,21 @@ def send_decision_email(
             tracking_url=tracking_url
         )
 
-        mail.send(msg)
+        with _mail_socket_timeout():
+            mail.send(msg)
+
         logger.info(
             'Decision email sent to %s for %s (status: %s)',
             to_email, ref_id, new_status
         )
         return True
+
+    except socket.timeout:
+        logger.error(
+            'Decision email to %s for %s timed out after %ss (SMTP connection hung)',
+            to_email, ref_id, _MAIL_SOCKET_TIMEOUT_SECONDS
+        )
+        return False
 
     except Exception:
         logger.error(
@@ -125,8 +163,18 @@ def send_result_email(to_email: str, applicant_name: str, application, predictio
             application=application,
             prediction=prediction
         )
-        mail.send(msg)
+
+        with _mail_socket_timeout():
+            mail.send(msg)
+
         return True
+
+    except socket.timeout:
+        logger.error(
+            'Result email for %s timed out after %ss (SMTP connection hung)',
+            application.reference_id, _MAIL_SOCKET_TIMEOUT_SECONDS
+        )
+        return False
 
     except Exception:
         logger.error(
