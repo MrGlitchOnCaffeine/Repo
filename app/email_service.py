@@ -51,26 +51,32 @@ def send_decision_email(
     admin_comment: str = None,
     application=None,
     application_ref: str = None,
+    tracking_url: str = None,
 ):
     """
     Sends a status decision email after an administrator updates an application.
 
-    Pass either `application` (ORM object, only safe on the main thread) or
-    `application_ref` (reference_id string, safe to pass across threads).
+    Pass either `application` (ORM object, main thread only) or
+    `application_ref` (reference_id string, safe across threads).
+    Pass `tracking_url` as a pre-built string when calling from a background
+    thread — url_for(_external=True) requires a request context which threads
+    do not have.
     Returns True on success, False on failure. Never raises.
     """
     ref_id = application_ref or (application.reference_id if application else 'unknown')
     subject = f'Application Update - {ref_id}'
 
     try:
-        tracking_url = url_for(
-            'main.application_details',
-            reference_id=ref_id,
-            _external=True
-        )
+        # Use the pre-built URL if provided. Fall back to url_for only when
+        # called from the main request thread where a request context exists.
+        if tracking_url is None:
+            tracking_url = url_for(
+                'main.application_details',
+                reference_id=ref_id,
+                _external=True
+            )
 
-        # Build a minimal context object so the template works whether we have
-        # the full ORM object or just the reference string.
+        # Minimal proxy so the template works with just a reference string.
         class _AppProxy:
             def __init__(self, ref):
                 self.reference_id = ref

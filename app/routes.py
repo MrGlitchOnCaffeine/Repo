@@ -352,37 +352,47 @@ def admin_update_application(reference_id):
                 applicant = User.query.get(application.user_id)
 
             if applicant:
-                # Snapshot plain values — ORM objects must not cross thread boundary.
+                # All values snapshotted as plain strings here, in the main
+                # thread while the request context is still active.
+                # The thread receives no ORM objects and makes no DB calls —
+                # this eliminates SQLite contention and context-related deadlocks.
                 _app            = current_app._get_current_object()
                 _to_email       = applicant.email
                 _applicant_name = applicant.full_name
                 _ref_id         = application.reference_id
                 _new_status     = new_status
                 _admin_comment  = admin_comment
-                _log_entry_id   = entry.id
+
+                # Build tracking URL here while request context exists.
+                # url_for(_external=True) inside a thread without a request
+                # context raises RuntimeError — generating it now avoids that.
+                try:
+                    _tracking_url = url_for(
+                        'main.application_details',
+                        reference_id=application.reference_id,
+                        _external=True
+                    )
+                except Exception:
+                    _tracking_url = None
 
                 def _send_in_background():
                     with _app.app_context():
                         try:
                             from app.email_service import send_decision_email
-                            from app import db as _db
-                            from app.models import AdminLog as _AdminLog
-                            sent = send_decision_email(
+                            send_decision_email(
                                 to_email=_to_email,
                                 applicant_name=_applicant_name,
                                 application_ref=_ref_id,
                                 new_status=_new_status,
-                                admin_comment=_admin_comment
+                                admin_comment=_admin_comment,
+                                tracking_url=_tracking_url
                             )
-                            if sent and _log_entry_id:
-                                log = _AdminLog.query.get(_log_entry_id)
-                                if log:
-                                    log.email_sent = True
-                                    _db.session.commit()
                         except Exception:
-                            admin_logger.error(
+                            import logging as _logging
+                            import traceback as _tb
+                            _logging.getLogger(__name__).error(
                                 'Background email thread failed for %s:\n%s',
-                                _ref_id, traceback.format_exc()
+                                _ref_id, _tb.format_exc()
                             )
 
                 t = threading.Thread(target=_send_in_background, daemon=True)
