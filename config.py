@@ -8,17 +8,12 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-key')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    # Falls back to MAIL_USERNAME if MAIL_DEFAULT_SENDER is not set.
+    # Brevo transactional email (HTTPS API, not SMTP).
+    # BREVO_API_KEY: generated in Brevo dashboard under SMTP & API > API Keys.
+    # BREVO_FROM_EMAIL: must be a verified sender in Brevo (Settings > Senders).
     # Both must be set as environment variables on Render.
-    MAIL_DEFAULT_SENDER = (
-        os.environ.get('MAIL_DEFAULT_SENDER') or os.environ.get('MAIL_USERNAME')
-    )
+    BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
+    BREVO_FROM_EMAIL = os.environ.get('BREVO_FROM_EMAIL')
 
     @staticmethod
     def get_database_uri():
