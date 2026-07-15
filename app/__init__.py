@@ -1,14 +1,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from config import config
 import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-mail = Mail()
 csrf = CSRFProtect()
 
 login_manager.login_view = 'main.login'
@@ -49,7 +47,6 @@ def create_app(config_name='default'):
 
     db.init_app(app)
     login_manager.init_app(app)
-    mail.init_app(app)
     csrf.init_app(app)
 
     from app.routes import main

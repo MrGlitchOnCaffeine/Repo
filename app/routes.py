@@ -316,8 +316,6 @@ def admin_update_application(reference_id):
 
     if new_status and new_status in valid_statuses:
         import logging
-        import threading
-        import traceback
         admin_logger = logging.getLogger(__name__)
 
         old_status = application.status
@@ -325,22 +323,13 @@ def admin_update_application(reference_id):
         application.admin_comment = admin_comment
         db.session.commit()
 
-        # Email is fired on a background daemon thread and NOT waited on.
-        #
-        # Render's free tier blocks outbound SMTP ports entirely at the
-        # network level (confirmed via Render's own changelog) — no
-        # code-level fix can make that connection succeed, only bound how
-        # long we wait for it to fail. Waiting on it synchronously — even
-        # with a timeout — meant every single status save paid that wait.
-        # Firing it and moving on keeps Save Status instant regardless.
-        # Once the platform-level SMTP limitation is resolved (paid plan or
-        # an HTTP-based email provider), delivery starts working with no
-        # further change needed here.
-        #
-        # email_sent below reflects whether a send was attempted, not
-        # confirmed delivery — true delivery confirmation would require
-        # waiting on the thread, which is exactly what we're avoiding.
-        email_attempted = False
+        # Sent synchronously — SendGrid's HTTP API is HTTPS on port 443,
+        # which is not blocked on Render's free tier (SMTP ports 25/465/587
+        # were; this was confirmed directly against this deployment). The
+        # call is bounded to 10s inside email_service.py, so this can no
+        # longer hang the request the way SMTP did. email_sent here reflects
+        # a real, confirmed outcome — not just an attempt.
+        email_sent = False
         if notify_applicant:
             from app.models import User
             applicant = application.user if hasattr(application, 'user') else None
@@ -348,39 +337,13 @@ def admin_update_application(reference_id):
                 applicant = User.query.get(application.user_id)
 
             if applicant:
-                email_attempted = True
-                from flask import current_app
-                _app            = current_app._get_current_object()
-                _to_email       = applicant.email
-                _applicant_name = applicant.full_name
-                _ref_id         = application.reference_id
-                _new_status     = new_status
-                _admin_comment  = admin_comment
-                _tracking_url   = url_for(
-                    'main.application_details',
-                    reference_id=application.reference_id,
-                    _external=True
+                email_sent = send_decision_email(
+                    to_email=applicant.email,
+                    applicant_name=applicant.full_name,
+                    application=application,
+                    new_status=new_status,
+                    admin_comment=admin_comment
                 )
-
-                def _send_decision_in_background():
-                    with _app.app_context():
-                        try:
-                            from app.email_service import send_decision_email
-                            send_decision_email(
-                                to_email=_to_email,
-                                applicant_name=_applicant_name,
-                                application_ref=_ref_id,
-                                new_status=_new_status,
-                                admin_comment=_admin_comment,
-                                tracking_url=_tracking_url
-                            )
-                        except Exception:
-                            logging.getLogger(__name__).error(
-                                'Background decision email failed for %s:\n%s',
-                                _ref_id, traceback.format_exc()
-                            )
-
-                threading.Thread(target=_send_decision_in_background, daemon=True).start()
             else:
                 admin_logger.warning(
                     'Could not find applicant for %s — notification not sent', reference_id
@@ -392,15 +355,15 @@ def admin_update_application(reference_id):
             action_description=(
                 f'Updated status of {reference_id} from {old_status} to {new_status}'
             ),
-            email_sent=email_attempted,
+            email_sent=email_sent,
             ip_address=request.remote_addr
         )
         db.session.add(entry)
         db.session.commit()
 
         flash(f'Status updated to {new_status}.', 'success')
-        if notify_applicant and not email_attempted:
-            flash('Status saved, but no applicant account was found to notify.', 'warning')
+        if notify_applicant and not email_sent:
+            flash('Status saved, but the notification email could not be sent.', 'warning')
 
     if override_result and override_result in valid_results and application.prediction:
         old_result = application.prediction.predicted_class
@@ -623,196 +586,96 @@ def admin_reports():
     )
 
 
-@main.route('/admin/diagnostics/smtp-test')
+@main.route('/admin/diagnostics/email-test')
 @login_required
 @admin_required
-def admin_smtp_diagnostic():
+def admin_email_diagnostic():
     """
-    Tests the SMTP connection in three separate stages so we can see exactly
-    where it fails: raw TCP connect, STARTTLS handshake, then authenticated
-    login. Each stage is timed and reported independently. This settles
-    definitively whether the connection is being network-blocked (raw
-    connect times out or is refused) versus a config/credentials issue
-    (connect succeeds, auth fails).
-
-    Visit this route directly in the browser while logged in as an admin.
-    Nothing is sent — no email leaves this diagnostic.
+    Sends a real test email via Brevo to the currently logged-in admin's
+    own email address, and reports exactly what happened. This confirms
+    end-to-end that BREVO_API_KEY and BREVO_FROM_EMAIL are configured
+    correctly and that the sender is verified in Brevo.
     """
-    import socket
-    import smtplib
-    import time
+    import requests
 
-    server = current_app.config.get('MAIL_SERVER', 'smtp.gmail.com')
-    port = current_app.config.get('MAIL_PORT', 587)
-    username = current_app.config.get('MAIL_USERNAME')
-    password = current_app.config.get('MAIL_PASSWORD')
-    sender = current_app.config.get('MAIL_DEFAULT_SENDER')
+    api_key = current_app.config.get('BREVO_API_KEY')
+    from_email = current_app.config.get('BREVO_FROM_EMAIL')
+    to_email = current_user.email
 
-    stages = []
+    rows = []
 
-    # Stage 0: config sanity check — no network involved
-    stages.append({
+    rows.append({
         'stage': '0. Configuration',
         'result': 'INFO',
         'detail': (
-            f'MAIL_SERVER={server!r}, MAIL_PORT={port!r}, '
-            f'MAIL_USERNAME={"SET" if username else "MISSING"}, '
-            f'MAIL_PASSWORD={"SET" if password else "MISSING"}, '
-            f'MAIL_DEFAULT_SENDER={sender!r}'
+            f'BREVO_API_KEY={"SET" if api_key else "MISSING"}, '
+            f'BREVO_FROM_EMAIL={from_email!r}, '
+            f'sending test to {to_email!r}'
         )
     })
 
-    # Stage 1: DNS resolution — report every address returned, both families
+    if not api_key or not from_email:
+        rows.append({
+            'stage': '1. Send test email',
+            'result': 'SKIPPED',
+            'detail': 'BREVO_API_KEY or BREVO_FROM_EMAIL is not set as an environment variable.'
+        })
+        return _render_email_diagnostic(rows)
+
+    payload = {
+        'sender': {'name': 'LEPS', 'email': from_email},
+        'to': [{'email': to_email}],
+        'subject': 'LEPS — Brevo Diagnostic Test',
+        'htmlContent': '<p>This is a test email confirming Brevo is configured correctly for LEPS.</p>'
+    }
+
     try:
-        addr_infos = socket.getaddrinfo(server, port, proto=socket.IPPROTO_TCP)
-        seen = set()
-        addr_list = []
-        for family, _, _, _, sockaddr in addr_infos:
-            ip = sockaddr[0]
-            fam_name = 'IPv6' if family == socket.AF_INET6 else 'IPv4'
-            key = (fam_name, ip)
-            if key not in seen:
-                seen.add(key)
-                addr_list.append((fam_name, ip, family))
+        response = requests.post(
+            'https://api.brevo.com/v3/smtp/email',
+            headers={
+                'accept': 'application/json',
+                'api-key': api_key,
+                'content-type': 'application/json'
+            },
+            json=payload,
+            timeout=10
+        )
 
-        stages.append({
-            'stage': '1. DNS resolution',
-            'result': 'INFO',
-            'detail': 'Resolved to: ' + ', '.join(f'{fam} {ip}' for fam, ip, _ in addr_list)
-        })
-    except Exception as e:
-        stages.append({
-            'stage': '1. DNS resolution',
-            'result': 'FAILED',
-            'detail': f'{type(e).__name__}: {e}'
-        })
-        return _render_smtp_diagnostic(stages)
-
-    # Stage 2: try each resolved address individually, IPv4 and IPv6 separately.
-    # This tells us definitively whether this is a routing/IPv6 issue (one
-    # family fails, the other succeeds) versus a genuine full block (every
-    # address, every family, fails the same way).
-    sock = None
-    working_family = None
-    for fam_name, ip, family in addr_list:
-        t0 = time.time()
-        try:
-            s = socket.socket(family, socket.SOCK_STREAM)
-            s.settimeout(8)
-            s.connect((ip, port))
-            elapsed = round(time.time() - t0, 2)
-            stages.append({
-                'stage': f'2. Connect via {fam_name} ({ip})',
+        if response.status_code == 201:
+            rows.append({
+                'stage': '1. Send test email',
                 'result': 'SUCCESS',
-                'detail': f'Connected in {elapsed}s'
-            })
-            sock = s
-            working_family = fam_name
-            break
-        except socket.timeout:
-            elapsed = round(time.time() - t0, 2)
-            stages.append({
-                'stage': f'2. Connect via {fam_name} ({ip})',
-                'result': 'TIMEOUT',
-                'detail': f'No response after {elapsed}s — packets likely being silently dropped.'
-            })
-        except OSError as e:
-            elapsed = round(time.time() - t0, 2)
-            stages.append({
-                'stage': f'2. Connect via {fam_name} ({ip})',
-                'result': 'FAILED',
-                'detail': f'{type(e).__name__}: {e} (after {elapsed}s)'
-            })
-
-    if sock is None:
-        stages.append({
-            'stage': '2. Summary',
-            'result': 'ALL FAILED',
-            'detail': (
-                'Every resolved address failed, across all address families. '
-                'This is consistent with the port itself being blocked at '
-                'the network level for every route out.'
-            )
-        })
-        return _render_smtp_diagnostic(stages)
-    else:
-        stages.append({
-            'stage': '2. Summary',
-            'result': 'INFO',
-            'detail': (
-                f'Connection succeeded via {working_family}. If another '
-                f'family failed above, this was a routing issue for that '
-                f'family specifically, not a full port block.'
-            )
-        })
-
-    # Stage 2: STARTTLS handshake — only reached if TCP connect succeeded
-    try:
-        smtp = smtplib.SMTP(timeout=10)
-        smtp.sock = sock
-        smtp.file = sock.makefile('rb')
-        smtp.helo()
-        smtp.starttls()
-        stages.append({
-            'stage': '3. STARTTLS handshake',
-            'result': 'SUCCESS',
-            'detail': 'TLS negotiation completed successfully.'
-        })
-    except Exception as e:
-        stages.append({
-            'stage': '3. STARTTLS handshake',
-            'result': 'FAILED',
-            'detail': f'{type(e).__name__}: {e}'
-        })
-        return _render_smtp_diagnostic(stages)
-
-    # Stage 3: authenticated login — only reached if TLS succeeded
-    try:
-        if not username or not password:
-            stages.append({
-                'stage': '4. Authentication',
-                'result': 'SKIPPED',
-                'detail': 'MAIL_USERNAME or MAIL_PASSWORD not set — cannot test login.'
+                'detail': f'Brevo accepted the email. Response: {response.text}. Check {to_email} inbox (and spam folder).'
             })
         else:
-            smtp.login(username, password)
-            stages.append({
-                'stage': '4. Authentication',
-                'result': 'SUCCESS',
-                'detail': f'Logged in as {username}. SMTP is fully functional end-to-end.'
+            rows.append({
+                'stage': '1. Send test email',
+                'result': 'FAILED',
+                'detail': f'Brevo returned HTTP {response.status_code}: {response.text}'
             })
-    except smtplib.SMTPAuthenticationError as e:
-        stages.append({
-            'stage': '4. Authentication',
-            'result': 'FAILED',
-            'detail': (
-                f'{e}. If using Gmail, this usually means an App Password '
-                f'is required (not your normal Gmail password), or 2FA is '
-                f'not enabled on the account.'
-            )
+
+    except requests.exceptions.Timeout:
+        rows.append({
+            'stage': '1. Send test email',
+            'result': 'TIMEOUT',
+            'detail': 'No response from Brevo after 10s.'
         })
     except Exception as e:
-        stages.append({
-            'stage': '4. Authentication',
+        rows.append({
+            'stage': '1. Send test email',
             'result': 'FAILED',
             'detail': f'{type(e).__name__}: {e}'
         })
-    finally:
-        try:
-            smtp.quit()
-        except Exception:
-            pass
 
-    return _render_smtp_diagnostic(stages)
+    return _render_email_diagnostic(rows)
 
 
-def _render_smtp_diagnostic(stages):
-    """Renders the SMTP diagnostic stages as plain, readable HTML."""
+def _render_email_diagnostic(stages):
+    """Renders the email diagnostic stages as plain, readable HTML."""
     rows = ''
     color_map = {
         'SUCCESS': '#2D6B40',
         'TIMEOUT': '#8C2A1E',
-        'REFUSED': '#8C2A1E',
         'FAILED': '#8C2A1E',
         'SKIPPED': '#7A5200',
         'INFO': '#374151',
@@ -831,13 +694,13 @@ def _render_smtp_diagnostic(stages):
     <!DOCTYPE html>
     <html>
     <head>
-        <title>SMTP Diagnostic</title>
+        <title>Email Diagnostic</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body style="font-family: Arial, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; background:#F8F5EE;">
-        <h2 style="font-size:1.25rem;">SMTP Diagnostic Result</h2>
+        <h2 style="font-size:1.25rem;">Brevo Email Diagnostic Result</h2>
         <p style="font-size:0.85rem; color:#6B6E7A; margin-bottom:1.5rem;">
-            No email was sent. This only tests the connection.
+            A real test email was sent to your own account email.
         </p>
         {rows}
         <p style="font-size:0.8rem; color:#9CA3AF; margin-top:1.5rem;">
@@ -877,7 +740,6 @@ def predict():
 
     import json
     import logging
-    import threading
     import traceback
 
     predict_logger = logging.getLogger(__name__)
@@ -923,40 +785,23 @@ def predict():
         reference_id, current_user.id
     )
 
-    # Email is fired on a background daemon thread and NOT waited on.
-    # Render's free tier blocks outbound SMTP ports entirely at the network
-    # level (confirmed via Render's own changelog) — no code-level fix can
-    # make that connection succeed, only bound how long we wait for it to
-    # fail. Since the connection can never succeed on this plan, waiting on
-    # it synchronously (even with a timeout) means every submission pays
-    # that wait. Firing it and moving on keeps the response instant either
-    # way — once the platform-level SMTP limitation is resolved (paid plan
-    # or an HTTP-based email provider), delivery will start working with no
-    # further changes needed here.
-    from flask import current_app
-    _app = current_app._get_current_object()
-    _to_email = current_user.email
-    _applicant_name = data['full_name']
-    _reference_id = reference_id
-
-    def _send_receipt_in_background():
-        with _app.app_context():
-            try:
-                from app.email_service import send_receipt_email
-                app_row = LoanApplication.query.filter_by(reference_id=_reference_id).first()
-                if app_row:
-                    send_receipt_email(
-                        to_email=_to_email,
-                        applicant_name=_applicant_name,
-                        application=app_row
-                    )
-            except Exception:
-                logging.getLogger(__name__).error(
-                    'Background receipt email failed for %s:\n%s',
-                    _reference_id, traceback.format_exc()
-                )
-
-    threading.Thread(target=_send_receipt_in_background, daemon=True).start()
+    # Sent synchronously — SendGrid's HTTP API is HTTPS on port 443, which
+    # is not blocked on Render's free tier (SMTP ports 25/465/587 were;
+    # confirmed directly against this deployment). The call is bounded to
+    # 10s inside email_service.py and never raises, so a failure here can
+    # never prevent the JSON response below from reaching the client.
+    try:
+        from app.email_service import send_receipt_email
+        send_receipt_email(
+            to_email=current_user.email,
+            applicant_name=data['full_name'],
+            application=application
+        )
+    except Exception:
+        predict_logger.error(
+            'Unexpected error calling send_receipt_email for %s:\n%s',
+            reference_id, traceback.format_exc()
+        )
 
     return jsonify({
         'application_id': reference_id,
