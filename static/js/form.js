@@ -197,7 +197,6 @@
                 return;
             }
 
-            // banner text
             text.textContent = errors.map(function (item) {
                 return item.message;
             }).join(' ');
@@ -205,7 +204,6 @@
             banner.style.display = 'block';
             banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            // first invalid field
             var firstError = errors[0];
             if (firstError && firstError.field) {
                 var field = document.getElementById(firstError.field);
@@ -233,17 +231,17 @@
             var dob = new Date(dobString);
             var today = new Date();
             var age = today.getFullYear() - dob.getFullYear();
-            var m = today.getMonth() - dob.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+            var monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
             return age;
         }
 
         function onlyDigits(input) {
             if (!input) return;
             input.addEventListener('input', function () {
-                var value = input.value.replace(/\D+/g, '');
-                if (input.value !== value) {
-                    input.value = value;
+                var digitsOnly = input.value.replace(/\D+/g, '');
+                if (input.value !== digitsOnly) {
+                    input.value = digitsOnly;
                 }
                 clearFieldError(input.id);
             });
@@ -380,10 +378,10 @@
             if (!loanAmount || loanAmount.value.trim() === '') {
                 addValidationError(errors, 'loan_amount_requested', 'Loan amount is required.');
             } else {
-                var amt = parseFloat(loanAmount.value);
-                if (isNaN(amt)) {
+                var loanAmountValue = parseFloat(loanAmount.value);
+                if (isNaN(loanAmountValue)) {
                     addValidationError(errors, 'loan_amount_requested', 'Loan amount must be a valid number.');
-                } else if (amt < 10000 || amt > 2000000) {
+                } else if (loanAmountValue < 10000 || loanAmountValue > 2000000) {
                     addValidationError(errors, 'loan_amount_requested', 'Loan amount must be between ₦10,000 and ₦2,000,000.');
                 }
             }
@@ -392,10 +390,10 @@
             if (!tenure || tenure.value.trim() === '') {
                 addValidationError(errors, 'loan_tenure_months', 'Repayment period is required.');
             } else {
-                var t = parseInt(tenure.value, 10);
-                if (isNaN(t)) {
+                var tenureValue = parseInt(tenure.value, 10);
+                if (isNaN(tenureValue)) {
                     addValidationError(errors, 'loan_tenure_months', 'Repayment period must be a valid number.');
-                } else if (t < 1 || t > 36) {
+                } else if (tenureValue < 1 || tenureValue > 36) {
                     addValidationError(errors, 'loan_tenure_months', 'Repayment period must be between 1 and 36 months.');
                 }
             }
@@ -565,24 +563,23 @@
                     body: JSON.stringify(formData)
                 })
                 .then(function (response) {
-                    return response.json().then(function (data) {
+                    return response.json().then(function (responseBody) {
                         return {
                             ok: response.ok,
                             status: response.status,
-                            data: data
+                            data: responseBody
                         };
                     });
                 })
-                .then(function (result) {
-                    if (!result.ok || result.data.error) {
+                .then(function (parsedResponse) {
+                    if (!parsedResponse.ok || parsedResponse.data.error) {
                         hideLoading();
                         setSubmitState(false);
-                        showErrors([{ field: null, message: result.data.error || 'An error occurred while submitting your application.' }]);
+                        showErrors([{ field: null, message: parsedResponse.data.error || 'An error occurred while submitting your application.' }]);
                         return;
                     }
-                    
 
-                    window.location.href = '/application-submitted/' + result.data.application_id;
+                    window.location.href = '/application-submitted/' + parsedResponse.data.application_id;
                 })
                 .catch(function () {
                     hideLoading();
