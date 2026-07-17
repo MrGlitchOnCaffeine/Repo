@@ -1,7 +1,44 @@
+import os
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from cryptography.fernet import Fernet
+from sqlalchemy.types import TypeDecorator, String
 from app import db
+
+
+def _get_fernet():
+    key = os.environ.get('ENCRYPTION_KEY')
+    if not key:
+        raise RuntimeError(
+            'ENCRYPTION_KEY environment variable is not set. '
+            'Generate one with Fernet.generate_key() and set it on Render.'
+        )
+    return Fernet(key.encode() if isinstance(key, str) else key)
+
+
+class EncryptedString(TypeDecorator):
+    """
+    Transparently encrypts a string value before it is written to the
+    database and decrypts it when it is read back. Used for BVN and NIN,
+    which were previously stored as plain text.
+
+    Encrypted values are longer than the original plaintext, so the
+    underlying column is sized generously (255 chars) regardless of the
+    real field length.
+    """
+    impl = String(255)
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        return _get_fernet().encrypt(value.encode()).decode()
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        return _get_fernet().decrypt(value.encode()).decode()
 
 
 class User(UserMixin, db.Model):
@@ -52,8 +89,10 @@ class LoanApplication(db.Model):
     # NOTE: BVN and NIN are stored in plaintext for this academic prototype.
     # In a production system these should be encrypted at rest (e.g. via
     # SQLAlchemy-Utils EncryptedType or AES encryption before storage).
-    bvn_number = db.Column(db.String(11), nullable=False)
-    nin_number = db.Column(db.String(11), nullable=False)
+    # Encrypted at rest via EncryptedString (see top of file). Was
+    # previously stored as plain text.
+    bvn_number = db.Column(EncryptedString, nullable=False)
+    nin_number = db.Column(EncryptedString, nullable=False)
     address = db.Column(db.String(200), nullable=False)
     city = db.Column(db.String(100), nullable=False)
 
