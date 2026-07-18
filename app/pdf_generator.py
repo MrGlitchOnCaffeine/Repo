@@ -266,7 +266,7 @@ def generate_application_pdf(application, prediction=None, key_factors=None):
     if estimated_loan is None:
         estimated_loan_text = "Not available"
     else:
-        estimated_loan_text = f"NGN {estimated_loan:,.2f}"
+        estimated_loan_text = f"NGN {estimated_loan:,.2f} (based on income and score, not a final offer)"
 
     assessment_rows = [
         [Paragraph("<b>Eligibility Score</b>", body_style), Paragraph(escape(score_text), body_bold_style)],
