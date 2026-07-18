@@ -392,7 +392,7 @@
                                 {% endif %}
                             </div>
                             {% if loan_amount is not none %}
-                                <span class="info-note">Based on income and eligibility score, not a final offer.</span>
+                                <span class="info-note">Over {{ application.loan_tenure_months }} months. Based on income and eligibility score, not a final offer.</span>
                             {% endif %}
                         </div>
                         <div class="info-card">
@@ -415,13 +415,20 @@
                     <p class="panel-subtitle">This reflects where the application sits in the process.</p>
                 </div>
                 <div class="panel-body">
+                    {% set is_final = application.status in ['Eligible', 'Not Eligible'] %}
+                    {% set review_class = 'active' if is_final else 'current' %}
+                    {% set decision_class = 'current' if is_final else '' %}
+                    {% set email_class = 'current' if is_final else '' %}
                     <div class="timeline">
                         <span class="timeline-step active">Submitted</span>
-                        <span class="timeline-step active">AI Assessment</span>
-                        <span class="timeline-step current">Administrative Review</span>
-                        <span class="timeline-step">Final Decision</span>
-                        <span class="timeline-step">Email Notification</span>
+                        <span class="timeline-step {{ 'active' if prediction else '' }}">AI Assessment</span>
+                        <span class="timeline-step {{ review_class }}">Administrative Review</span>
+                        <span class="timeline-step {{ decision_class }}">Final Decision</span>
+                        <span class="timeline-step {{ email_class }}">Email Notification</span>
                     </div>
+                    <p style="margin-top: .6rem; font-size: .82rem; color: var(--text-muted);">
+                        Current status: <strong>{{ application.status }}</strong>
+                    </p>
 
                     <div style="margin-top: 1rem;" class="muted-box">
                         The information below is based on the application record stored in the system.
