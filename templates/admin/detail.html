@@ -95,7 +95,10 @@
                             {% if prediction.estimated_loan_amount %}
                                 <tr>
                                     <td class="detail-key">Estimated Loan Amount</td>
-                                    <td>&#8358;{{ "{:,.0f}".format(prediction.estimated_loan_amount) }}</td>
+                                    <td>
+                                        &#8358;{{ "{:,.0f}".format(prediction.estimated_loan_amount) }}
+                                        <span class="text-muted" style="font-size: .78rem; font-weight: 400;">(based on income and score, not a final offer)</span>
+                                    </td>
                                 </tr>
                             {% endif %}
                             {% if prediction.denial_reason %}
